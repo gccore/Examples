@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @another_ghasem
- * g1999raemzani@gmail.com
+ * g1999ramezani@gmail.com
  */
 
 #include <algorithm>
@@ -22,18 +22,18 @@
 #include <random>
 
 namespace core {
-  struct rectangle {
-    using vec = std::vector<rectangle>;
-    
-    double l, w;
-    double perimeter() const noexcept {
-      return 2 * (l + w);
-    }
-  };
-  
-  std::ostream& operator<<(std::ostream& output, rectangle const& input) {
-    return output << input.l << ", " << input.w << " : " << input.perimeter();
+struct rectangle {
+  using vec = std::vector<rectangle>;
+
+  double l, w;
+  double perimeter() const noexcept {
+    return 2 * (l + w);
   }
+};
+
+std::ostream& operator<<(std::ostream& output, rectangle const& input) {
+  return output << input.l << ", " << input.w << " : " << input.perimeter();
+}
 } // namespace core
 
 auto generate_random_rec(std::size_t length = 5) noexcept {

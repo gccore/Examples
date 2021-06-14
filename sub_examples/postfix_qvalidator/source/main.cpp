@@ -13,7 +13,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @another_ghasem
- * g1999raemzani@gmail.com
+ * g1999ramezani@gmail.com
  */
 
 #include <QRegularExpressionValidator>
