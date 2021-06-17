@@ -16,6 +16,7 @@
  * g1999ramezani@gmail.com
  */
 
+#include <unordered_map>
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -54,26 +55,38 @@ auto generate_string_list(std::size_t const length) noexcept {
 }
 } // namespace core
 
-int main() {
-  auto const keys = core::generate_string_list(10'000'000);
-  ska::bytell_hash_map<std::string, std::size_t> bytell_hash_map;
-
+namespace benchmark {
+template <typename Hash_Map>
+void test_it(Hash_Map& hash_map, core::vec_string const& data) noexcept {
   {
     boost::timer::auto_cpu_timer insert_counter;
     (void)insert_counter;
-    for (auto const& key : keys) {
-      bytell_hash_map[key] = key.size();
+    for (auto const& key : data) {
+      hash_map[key] = key.size();
     }
   }
   {
     auto const key = core::generator();
     boost::timer::auto_cpu_timer worst_case_find;
     (void)worst_case_find;
-    for (std::size_t i = 0; i < keys.size(); ++i) {
-      if (bytell_hash_map.find(key) != std::cend(bytell_hash_map)) {
+    for (std::size_t i = 0; i < data.size(); ++i) {
+      if (hash_map.find(key) != std::cend(hash_map)) {
         std::cout << "We find it" << std::endl;
         break;
       }
     }
+  }
+}
+} // namespace benchmark
+
+int main() {
+  auto const keys = core::generate_string_list(20'000'000);
+  {
+    ska::bytell_hash_map<std::string, std::size_t> bytell_hash_map;
+    std::cout << "bytell_hash_map:\n"; benchmark::test_it(bytell_hash_map, keys);
+  }
+  {
+    std::unordered_map<std::string, std::size_t> std_hash_map;
+    std::cout << "std_hash_map:\n"; benchmark::test_it(std_hash_map, keys);
   }
 }
