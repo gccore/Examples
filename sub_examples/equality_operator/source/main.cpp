@@ -23,14 +23,14 @@
 
 namespace core {
 struct person final {
+  using list = QList<core::person>;
+
   QString name;
   std::uint16_t age;
 
-  person(QString const& name_,
-         std::uint16_t const age_)
-    : name(name_), age(age_), m_id(QUuid::createUuid()) {
-
-  }
+  person(QString const& name_, std::uint16_t const age_)
+    : name(name_), age(age_), m_id(QUuid::createUuid())
+  {}
   bool operator==(person const& other_person) const noexcept {
     return (m_id == other_person.m_id) && (name == other_person.name);
   }
@@ -41,7 +41,7 @@ struct person final {
 } // namespace core
 
 int main() {
-  QList<core::person> const folks = {
+  core::person::list const folks = {
     {"ghasem", 21},
     {"other ghasem", 22},
     {"another ghasem", 23},
