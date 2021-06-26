@@ -20,6 +20,7 @@
 #include <type_traits>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 #include <random>
 #include <limits>
 #include <vector>
@@ -43,66 +44,80 @@ struct parameter final {
 } // namespace core
 
 namespace client {
-struct generator final {
-  static std::string string_generator(std::size_t const length_limit = 20) noexcept {
-    static constexpr auto rand_char_limit = 25;
-    static constexpr auto first_capital_char = 65;
-    static constexpr auto first_lowercase_char = 97;
+namespace generator {
+static std::string string_generator(std::size_t const length_limit = 20) noexcept {
+  static constexpr auto rand_char_limit = 25;
+  static constexpr auto first_capital_char = 65;
+  static constexpr auto first_lowercase_char = 97;
 
-    std::string random_string;
-    random_string.resize(std::rand() % length_limit + length_limit / 3);
+  std::string random_string;
+  random_string.resize(std::rand() % length_limit + length_limit / 3);
 
-    std::generate(std::begin(random_string), std::end(random_string), [] {
-      return char((std::rand() % rand_char_limit) +
-                  (std::rand() % 2 == 1 ? first_capital_char : first_lowercase_char));
-    });
-    return random_string;
-  }
-  static int number_generator(int const min = std::numeric_limits<int>::lowest(),
-                              int const max = std::numeric_limits<int>::max()) noexcept {
-    static std::random_device random_device;
-    static std::mt19937_64 m19937(random_device());
-    static std::uniform_int_distribution<int> distribution(min, max);
-    return distribution(m19937);
-  }
+  std::generate(std::begin(random_string), std::end(random_string), [] {
+    return char((std::rand() % rand_char_limit) +
+                (std::rand() % 2 == 1 ? first_capital_char : first_lowercase_char));
+  });
+  return random_string;
+}
+static int number_generator(int const min = std::numeric_limits<int>::lowest(),
+                            int const max = std::numeric_limits<int>::max()) noexcept {
+  static std::random_device random_device;
+  static std::mt19937_64 m19937(random_device());
+  static std::uniform_int_distribution<int> distribution(min, max);
+  return distribution(m19937);
+}
 
-  struct constant {
-    static inline auto constexpr limits = 2ULL;
-  };
-
-  static void string_type(core::parameter& parameter) noexcept {
-    parameter.d = string_generator();
-  }
-  static void number_type(core::parameter& parameter) noexcept {
-    parameter.d = number_generator();
-  }
-  static void string_array_type(core::parameter& parameter) noexcept {
-    using array_type_t = std::vector<std::string>;
-    array_type_t result(constant::limits);
-    std::generate(std::begin(result), std::end(result), [] {return string_generator();});
-    parameter.d = result;
-  }
-  static void number_array_type(core::parameter& parameter) noexcept {
-    using array_type_t = std::vector<int>;
-    array_type_t result(constant::limits);
-    std::generate(std::begin(result), std::end(result), [] {return number_generator();});
-    parameter.d = result;
-  }
-
-  static void init(core::parameter& parameter) noexcept {
-    try { map.at(parameter.t)(parameter); } catch (...) { }
-  }
-
-  using function_t = void (*)(core::parameter&);
-  using gen_map_t = std::unordered_map<core::parameter::type, function_t>;
-  static inline gen_map_t const map = {
-    {core::parameter::type::integer, &number_type},
-    {core::parameter::type::string, &string_type},
-    {core::parameter::type::string_array, &string_array_type},
-    {core::parameter::type::integer_array, &number_array_type},
-    {core::parameter::type::unknown, nullptr},
-  };
+struct constant {
+  static inline auto constexpr limits = 2ULL;
 };
+
+template<core::parameter::type Type>
+void init_type(core::parameter& parameter) noexcept {
+  (void)(parameter);
+  assert(false);
+}
+template<>
+void init_type<core::parameter::type::integer>(core::parameter& parameter) noexcept {
+  parameter.d = number_generator();
+}
+template<>
+void init_type<core::parameter::type::string>(core::parameter& parameter) noexcept {
+  parameter.d = string_generator();
+}
+template<>
+void init_type<core::parameter::type::integer_array>(core::parameter& parameter) noexcept {
+  using array_type_t = std::vector<int>;
+  array_type_t result(constant::limits);
+  std::generate(std::begin(result), std::end(result), [] {
+    return number_generator();
+  });
+  parameter.d = result;
+}
+template<>
+void init_type<core::parameter::type::string_array>(core::parameter& parameter) noexcept {
+  using array_type_t = std::vector<std::string>;
+  array_type_t result(constant::limits);
+  std::generate(std::begin(result), std::end(result), [] {
+    return string_generator();
+  });
+  parameter.d = result;
+}
+
+using function_t = void (*)(core::parameter&);
+using gen_map_t = std::unordered_map<core::parameter::type, function_t>;
+static inline gen_map_t const map = {
+  {core::parameter::type::integer, &init_type<core::parameter::type::integer>},
+  {core::parameter::type::string, &init_type<core::parameter::type::string>},
+  {core::parameter::type::string_array, &init_type<core::parameter::type::string_array>},
+  {core::parameter::type::integer_array, &init_type<core::parameter::type::integer_array>},
+  {core::parameter::type::unknown, nullptr},
+};
+
+static void init(core::parameter& parameter) noexcept {
+  try { map.at(parameter.t)(parameter); } catch (...) { }
+}
+} // namespace generator
+
 struct print final {
   using enum_param_map_t = std::unordered_map<core::parameter::type, char const* const>;
   static inline enum_param_map_t const map = {
