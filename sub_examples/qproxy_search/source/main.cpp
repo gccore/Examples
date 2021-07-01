@@ -16,6 +16,8 @@
  * g1999ramezani@gmail.com
  */
 
+#include <memory>
+
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -29,7 +31,17 @@
 
 namespace core {
 struct my_widget final: QDialog {
-  my_widget() : QDialog(nullptr) {
+  std::unique_ptr<QStandardItemModel> const numbers_model;
+  std::unique_ptr<QStandardItemModel> const names_model;
+  std::unique_ptr<QSortFilterProxyModel> const numbers_proxy;
+  std::unique_ptr<QSortFilterProxyModel> const names_proxy;
+
+  my_widget()
+    : QDialog(nullptr),
+      numbers_model(new QStandardItemModel),
+      names_model(new QStandardItemModel),
+      numbers_proxy(new QSortFilterProxyModel),
+      names_proxy(new QSortFilterProxyModel) {
     auto const numbers = new QListView;
     auto const names = new QListView;
     auto const numbers_search = new QLineEdit;
@@ -45,30 +57,26 @@ struct my_widget final: QDialog {
     main_layout->addLayout(layout_2);
     setLayout(main_layout);
 
-    auto const numbers_model = new QStandardItemModel;
     numbers_model->appendRow(new QStandardItem("1"));
     numbers_model->appendRow(new QStandardItem("2"));
     numbers_model->appendRow(new QStandardItem("3"));
     numbers_model->appendRow(new QStandardItem("4"));
-    auto const names_model = new QStandardItemModel;
     names_model->appendRow(new QStandardItem("amir"));
     names_model->appendRow(new QStandardItem("another-amir"));
     names_model->appendRow(new QStandardItem("ghasem"));
     names_model->appendRow(new QStandardItem("another-ghasem"));
 
-    auto const numbers_proxy = new QSortFilterProxyModel;
-    numbers_proxy->setSourceModel(numbers_model);
+    numbers_proxy->setSourceModel(numbers_model.get());
     numbers_proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    numbers->setModel(numbers_proxy);
-    auto const names_proxy = new QSortFilterProxyModel;
-    names_proxy->setSourceModel(names_model);
+    numbers->setModel(numbers_proxy.get());
+    names_proxy->setSourceModel(names_model.get());
     names_proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    names->setModel(names_proxy);
+    names->setModel(names_proxy.get());
 
-    connect(numbers_search, &QLineEdit::textChanged, [numbers_proxy](auto const value) {
+    connect(numbers_search, &QLineEdit::textChanged, [this](auto const value) {
       numbers_proxy->setFilterRegularExpression(value);
     });
-    connect(names_search, &QLineEdit::textChanged, [names_proxy](auto const value) {
+    connect(names_search, &QLineEdit::textChanged, [this](auto const value) {
       names_proxy->setFilterFixedString(value);
     });
   }
