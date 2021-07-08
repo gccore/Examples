@@ -3,7 +3,16 @@
 #include <iostream>
 
 namespace demo::v1 {
-void user::login(drogon::HttpRequestPtr const& reqest, callback_t&& callback,
+void user::users_info(user_private::data&& data, callback_t&& callback) const {
+  LOG_DEBUG << "User: " << data.user_name << ".";
+  Json::Value result;
+  result["user_name"] = data.user_name;
+  result["password"] = data.password;
+  result["token"] = data.token;
+  callback(drogon::HttpResponse::newHttpJsonResponse(result));
+}
+
+void user::login(drogon::HttpRequestPtr const& request, callback_t&& callback,
                  std::string&& user_id, std::string const& password) {
   LOG_DEBUG << "User: " << user_id << "(" << password << ") login.";
   Json::Value result;
@@ -12,7 +21,7 @@ void user::login(drogon::HttpRequestPtr const& reqest, callback_t&& callback,
   callback(drogon::HttpResponse::newHttpJsonResponse(result));
 }
 
-void user::get_info(drogon::HttpRequestPtr const& reqest, callback_t&& callback,
+void user::get_info(drogon::HttpRequestPtr const& request, callback_t&& callback,
                     std::string user_id, std::string const& token) const {
   LOG_DEBUG << "User: " << user_id << "(" << token << ") information.";
   Json::Value result;
