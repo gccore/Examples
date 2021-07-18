@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "-fsanitize=address -fanalyzer -Wall -Wextra -Wpedantic -pedantic-errors -O2")
+  set(CMAKE_CXX_FLAGS "-fsanitize=address -fanalyzer -Wall -Wextra -Wpedantic -pedantic-errors")
 endif()
 
 file(GLOB SUB_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/sub_examples/*)
