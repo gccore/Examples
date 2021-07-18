@@ -4,6 +4,7 @@ project(examples LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(flags_address_sanitizer "flags_address_sanitizer" OFF)
 option(flags_gcc_analyzer "flags_analyzer" OFF)
