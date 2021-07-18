@@ -18,8 +18,10 @@
 
 #include <iostream>
 
+extern "C" {
 #include <sys/socket.h>
 #include <sys/types.h>
+}
 
 int main() {
 }
