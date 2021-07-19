@@ -39,7 +39,7 @@ struct client_request final {
     if (constant::socket::error == client) {
       throw core::exception("accept() return value: -1");
     } else {
-      ::write(socket_descriptor, echo_message.c_str(), echo_message.size());
+      //      ::write(socket_descriptor, echo_message.c_str(), echo_message.size());
     }
   }
 };
