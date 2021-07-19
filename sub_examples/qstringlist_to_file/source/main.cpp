@@ -22,9 +22,7 @@
 #include <QFile>
 
 namespace core {
-constexpr auto out_file_path = "output.txt";
-
-void write_qstring_to_file(QStringList const& list, QString const& path) {
+void write_qstringlist_to_file(QStringList const& list, QString const& path) {
   QFile file(path);
   if (file.open(QIODevice::WriteOnly)) {
     QTextStream stream(&file);
@@ -41,5 +39,5 @@ int main() {
   QStringList const list = {
     "_1", "_2", "_3", "_4"
   };
-  core::write_qstring_to_file(list, core::out_file_path);
+  core::write_qstringlist_to_file(list, "output.txt");
 }
