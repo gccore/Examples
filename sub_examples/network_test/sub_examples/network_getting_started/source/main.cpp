@@ -17,21 +17,59 @@
  */
 
 #include <iostream>
+#include <mutex>
 
 #include "csocket.hpp"
 #include "global.hpp"
 #include "constant.h"
+#include "utility.h"
 
-int main() {
+namespace threading {
+class cout final {
+ private:
+  std::mutex cout_lock;
+
+ public:
+  void lock() {
+    cout_lock.lock();
+  }
+  ~cout() {
+    cout_lock.unlock();
+  }
+};
+} // namespace threading
+
+namespace network_example {
+void run_server() noexcept {
   try {
-
-    core::config::port = 64'000;
-    core::config::backlog = 5;
     core::socket socket;
     socket.echo_message() = "Ghasem is right here";
     socket.bind().listen().run();
-
   } catch (std::exception& exception) {
-    std::cout << exception.what() << std::endl;
+    threading::cout().lock();
+    std::cerr << exception.what() << std::endl;
+  }
+}
+void run_client() noexcept {
+  try {
+    core::socket socket(core::socket::socket_type::client);
+    socket.connect().read(256);
+    std::cout << socket.buffer() << std::endl;
+  } catch (std::exception& exception) {
+    threading::cout().lock();
+    std::cerr << exception.what() << std::endl;
+  }
+}
+} // namespace natwork_example
+
+int main() {
+  core::config::port = 64'015;
+  core::config::ip = core::constant::network::loopback;
+  core::config::backlog = 5;
+
+  std::thread(network_example::run_server).detach();
+  for (auto const iterator : core::util::range<0, 10>()) {
+    (void)iterator;
+    network_example::run_client();
   }
 }

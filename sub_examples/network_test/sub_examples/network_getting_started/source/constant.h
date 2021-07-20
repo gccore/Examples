@@ -12,4 +12,8 @@ auto constexpr type = SOCK_STREAM;
 auto constexpr error = -1;
 auto constexpr bind_success = 0;
 } // namespace socket
+
+namespace network {
+auto constexpr loopback = "127.0.0.1";
+} // namespace network
 } // namespace core::constant
