@@ -22,9 +22,20 @@
 #include <QFile>
 
 namespace core {
-void write_qstringlist_to_file(QStringList const& list, QString const& path) {
+enum class open_mode {
+  append, truncate
+};
+
+auto create_w_open_flags(open_mode const mode) {
+  return mode == open_mode::truncate ?
+         QIODevice::WriteOnly : QIODevice::WriteOnly | QIODevice::Append;
+}
+
+void write_qstringlist_to_file(QStringList const& list,
+                               QString const& path,
+                               open_mode const mode = open_mode::truncate) {
   QFile file(path);
-  if (file.open(QIODevice::WriteOnly)) {
+  if (file.open(create_w_open_flags(mode))) {
     QTextStream stream(&file);
     for (auto const& item : list) {
       stream << item << '\n';
