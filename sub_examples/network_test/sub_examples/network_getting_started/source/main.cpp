@@ -63,7 +63,9 @@ void run_client() noexcept {
 } // namespace natwork_example
 
 int main() {
-  core::config::port = 64'015;
+  std::cout << "Hostname: " << core::util::host_name() << std::endl;
+
+  core::config::port = 64'115;
   core::config::ip = core::constant::network::loopback;
   core::config::backlog = 5;
 

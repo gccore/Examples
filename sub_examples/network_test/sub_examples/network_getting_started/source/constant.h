@@ -16,4 +16,8 @@ auto constexpr bind_success = 0;
 namespace network {
 auto constexpr loopback = "127.0.0.1";
 } // namespace network
+
+namespace string {
+auto constexpr nul = '\0';
+} // namespace string
 } // namespace core::constant

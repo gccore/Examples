@@ -16,20 +16,9 @@ extern "C" {
 #include <netdb.h>
 }
 
-#include "global.hpp"
+#include "exception.hpp"
 #include "constant.h"
-
-namespace core {
-struct exception final: std::exception {
-  std::string message;
-  exception(std::string const& message_)
-    : message(message_) {
-  }
-  const char* what() const noexcept override {
-    return message.c_str();
-  }
-};
-} // namespace core
+#include "global.hpp"
 
 namespace core {
 struct client_request final {
@@ -178,7 +167,7 @@ class socket final {
   }
 
   socket& read(std::size_t const length) {
-    m_buffer.resize(length);
+    m_buffer.resize(length, constant::string::nul);
     auto const result = ::read(m_descriptor, m_buffer.data(), length);
     if (constant::socket::error == result) {
       throw core::exception("read() failed: " + std::to_string(result));
