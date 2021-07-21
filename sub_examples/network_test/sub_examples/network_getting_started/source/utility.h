@@ -34,7 +34,7 @@ struct range final {
 
 inline auto host_name() {
   std::string result;
-  result.reserve(_SC_HOST_NAME_MAX, constant::string::nul);
+  result.resize(_SC_HOST_NAME_MAX, constant::string::nul);
   auto const ret_status = ::gethostname(result.data(), result.size());
 
   if (constant::socket::error == ret_status) {
