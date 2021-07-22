@@ -32,6 +32,14 @@ struct range final {
   }
 };
 
+template <std::size_t Length, typename Operator, typename ... Args>
+constexpr void repeat_for(Operator ope, Args&& ... args) {
+  for (auto const _ : range<0, Length>()) {
+    (void)_;
+    ope(std::forward(args) ...);
+  }
+}
+
 inline auto host_name() {
   std::string result;
   result.resize(_SC_HOST_NAME_MAX, constant::string::nul);

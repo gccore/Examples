@@ -50,14 +50,11 @@ namespace chapter_01 {
 void run() noexcept {
   std::cout << "Hostname: " << core::util::host_name() << std::endl;
 
-  core::config::port = 64'115;
+  core::config::port = 64'145;
   core::config::ip = core::constant::network::loopback;
   core::config::backlog = 5;
 
   std::thread(network_example::run_server).detach();
-  for (auto const iterator : core::util::range<0, 10>()) {
-    (void)iterator;
-    network_example::run_client();
-  }
+  core::util::repeat_for<10>(network_example::run_client);
 }
 } // namespace chapter_01

@@ -82,7 +82,7 @@ class socket final {
  public:
   enum class mode {
     blocking,
-    detach
+    deamon
   };
   enum class state {
     stopping,
@@ -111,6 +111,9 @@ class socket final {
   }
   ~socket() {
     ::close(m_descriptor);
+    if (m_thread.joinable()) {
+      m_thread.join();
+    }
   }
 
  public:
@@ -158,7 +161,7 @@ class socket final {
       case mode::blocking:
         start_loop();
         break;
-      case mode::detach:
+      case mode::deamon:
         m_thread = std::thread(&socket::start_loop, this);
         break;
     }
