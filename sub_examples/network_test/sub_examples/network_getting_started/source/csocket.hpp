@@ -80,10 +80,6 @@ class socket final {
   }
 
  public:
-  enum class mode {
-    blocking,
-    deamon
-  };
   enum class state {
     stopping,
     running
@@ -111,9 +107,6 @@ class socket final {
   }
   ~socket() {
     ::close(m_descriptor);
-    if (m_thread.joinable()) {
-      m_thread.join();
-    }
   }
 
  public:
@@ -156,16 +149,8 @@ class socket final {
     return *this;
   }
 
-  socket& run(mode const m = mode::blocking) {
-    switch (m) {
-      case mode::blocking:
-        start_loop();
-        break;
-      case mode::deamon:
-        m_thread = std::thread(&socket::start_loop, this);
-        break;
-    }
-
+  socket& run() {
+    start_loop();
     return *this;
   }
 
@@ -186,12 +171,6 @@ class socket final {
     m_run_loop = s == state::running ? true : false;
   }
 
-  void block() {
-    if (m_thread.joinable()) {
-      m_thread.join();
-    }
-  }
-
   std::string const& echo_message() const {
     return m_echo_message;
   }
@@ -207,7 +186,6 @@ class socket final {
   sockaddr_in m_socketaddr;
   std::uint16_t m_port;
   std::string m_ip;
-  std::thread m_thread;
   std::atomic_bool m_run_loop;
   std::string m_echo_message;
   socket_type m_socket_type;
