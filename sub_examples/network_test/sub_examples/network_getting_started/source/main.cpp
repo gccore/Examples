@@ -19,7 +19,9 @@
 #include <iostream>
 
 #include "chapter01.hpp"
+#include "chapter02.hpp"
 
 int main() {
   //  chapter_01::run();
+  chapter_02::run();
 }

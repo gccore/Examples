@@ -36,7 +36,7 @@ void run_server() noexcept {
 }
 void run_client() noexcept {
   try {
-    core::socket socket(core::socket::socket_type::client);
+    core::socket socket(core::socket::type::client);
     socket.connect().read(256);
     std::cout << socket.buffer() << std::endl;
   } catch (std::exception& exception) {

@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <string>
+#include <memory>
 #include <thread>
 #include <atomic>
 
@@ -21,92 +22,68 @@ extern "C" {
 #include "global.hpp"
 
 namespace core {
+class socket;
+
 struct client_request final {
   sockaddr_in name = {0, 0, 0, 0};
-  int client = 0;
+  std::unique_ptr<socket> client;
   socklen_t length = sizeof(name);
   std::string echo_message;
 
-  ~client_request() {
-    ::close(client);
-  }
+  ~client_request();
 
-  void check_request(int const socket_descriptor) {
-    client = ::accept(socket_descriptor, reinterpret_cast<sockaddr*>(&name), &length);
-    if (constant::socket::error == client) {
-      throw core::exception("accept() return value: -1");
-    } else {
-      ::write(client, echo_message.c_str(), echo_message.size());
-    }
-  }
+  void check_request(socket const& socket_descriptor);
 };
 
 class socket final {
- private:
-  bool is_failed() const noexcept {
-    return constant::socket::error == m_descriptor;
-  }
-
-  void init_common_socketaddr() noexcept {
-    ::bzero(&m_socketaddr, sizeof(m_socketaddr));
-    m_socketaddr.sin_family = AF_INET;
-    m_socketaddr.sin_port = ::htons(m_port);
-  }
-
-  void init_server() noexcept {
-    init_common_socketaddr();
-    m_socketaddr.sin_addr.s_addr = ::htonl(INADDR_ANY);
-  }
-
-  void init_client() noexcept {
-    init_common_socketaddr();
-    m_socketaddr.sin_addr.s_addr = ::inet_addr(m_ip.c_str());
-  }
-
-  void set_port(std::uint16_t const port) noexcept {
-    m_port = port;
-  }
-
-  void set_ip(std::string const& ip) noexcept {
-    m_ip = ip;
-  }
-
-  void start_loop() {
-    while (m_run_loop) {
-      client_request request;
-      request.echo_message = echo_message();
-      request.check_request(m_descriptor);
-    }
-  }
-
  public:
   enum class state {
     stopping,
     running
   };
-  enum class socket_type {
+  enum class type {
     server,
     client
   };
+  enum class option {
+    reuse_address
+  };
 
  public:
-  socket(socket_type const t,
+  operator int() const noexcept {
+    return m_descriptor;
+  }
+
+ public:
+  socket(type const t,
          int const domain = constant::socket::domain,
          int const type = constant::socket::type,
          int const protocol = constant::socket::protocol)
     : m_descriptor(::socket(domain, type, protocol)),
-      m_run_loop(t == socket_type::server),
+      m_run_loop(t == type::server),
       m_socket_type(t) {
     if (is_failed()) {
       throw core::exception("socket() return value: -1");
     }
   }
-  socket()
-    : socket(socket_type::server) {
-
+  socket() = default;
+  socket(socket const& parent,
+         sockaddr_in name,
+         socklen_t length)
+    : m_descriptor(::accept(parent,
+                            reinterpret_cast<sockaddr*>(&name), &length)),
+      m_run_loop(false), m_socket_type(type::client) {
+    if (is_failed()) {
+      throw core::exception("accept() failed: " + std::string(strerror(errno)));
+    }
   }
   ~socket() {
     ::close(m_descriptor);
+  }
+
+ public:
+  bool operator==(int const other) {
+    return other == m_descriptor;
   }
 
  public:
@@ -158,9 +135,54 @@ class socket final {
     m_buffer.resize(length, constant::string::nul);
     auto const result = ::read(m_descriptor, m_buffer.data(), length);
     if (constant::socket::error == result) {
-      throw core::exception("read() failed: " + std::to_string(result));
+      throw core::exception("read() failed: " + std::string(strerror(errno)));
     }
 
+    return *this;
+  }
+
+  socket& send(std::string const& data,
+               int const flags = constant::socket::empty) {
+    auto const ret_value = ::send(m_descriptor, data.data(), data.size(), flags);
+    if (ret_value != static_cast<int>(data.size())) {
+      throw core::exception("read() failed: " + std::string(strerror(errno)));
+    }
+    return *this;
+  }
+
+  socket& send(int const flags = constant::socket::empty) {
+    return send(m_buffer, flags);
+  }
+
+  socket& set_option(int const level, int const option_name,
+                     void* const option_value, socklen_t const length) {
+    auto const ret_value = ::setsockopt(m_descriptor,
+                                        level, option_name,
+                                        option_value, length);
+    if (constant::socket::error == ret_value) {
+      throw core::exception("setsockopt() failed: " + std::string(strerror(errno)));
+    }
+    return *this;
+  }
+
+  socket& set_option(option const ope) {
+    int value = 1;
+    return set_option(SOL_SOCKET, create_opetion(ope), &value, sizeof(value));
+  }
+
+  std::string receive(std::size_t const length,
+                      int const flags = constant::socket::empty) {
+    std::string result;
+    result.resize(length, constant::string::nul);
+    auto const ret_value = ::recv(m_descriptor, result.data(), length, flags);
+    if (constant::socket::error == ret_value) {
+      throw core::exception("recv() failed: " + std::string(strerror(errno)));
+    }
+    return result;
+  }
+
+  socket& delay(std::size_t const second) noexcept {
+    std::this_thread::sleep_for(std::chrono::seconds(second));
     return *this;
   }
 
@@ -180,6 +202,56 @@ class socket final {
   std::string const& buffer() const {
     return m_buffer;
   }
+  std::string& buffer() {
+    return m_buffer;
+  }
+
+ private:
+  bool is_failed() const noexcept {
+    return constant::socket::error == m_descriptor;
+  }
+
+  void init_common_socketaddr() noexcept {
+    ::bzero(&m_socketaddr, sizeof(m_socketaddr));
+    m_socketaddr.sin_family = AF_INET;
+    m_socketaddr.sin_port = ::htons(m_port);
+  }
+
+  void init_server() noexcept {
+    init_common_socketaddr();
+    m_socketaddr.sin_addr.s_addr = ::htonl(INADDR_ANY);
+  }
+
+  void init_client() noexcept {
+    init_common_socketaddr();
+    m_socketaddr.sin_addr.s_addr = ::inet_addr(m_ip.c_str());
+  }
+
+  void set_port(std::uint16_t const port) noexcept {
+    m_port = port;
+  }
+
+  void set_ip(std::string const& ip) noexcept {
+    m_ip = ip;
+  }
+
+  void start_loop() {
+    while (m_run_loop) {
+      client_request request;
+      request.echo_message = echo_message();
+      request.check_request(*this);
+    }
+  }
+
+  int create_opetion(option const ope) {
+    int result = -1;
+    switch (ope) {
+      case option::reuse_address:
+        result = SO_REUSEADDR;
+        break;
+    }
+    return result;
+  }
 
  private:
   int m_descriptor;
@@ -188,7 +260,17 @@ class socket final {
   std::string m_ip;
   std::atomic_bool m_run_loop;
   std::string m_echo_message;
-  socket_type m_socket_type;
+  type m_socket_type;
   std::string m_buffer;
 };
+
+inline client_request::~client_request() {
+  ::close(*client);
+}
+
+inline void client_request::check_request(socket const& socket_descriptor) {
+  client = std::make_unique<core::socket>(socket_descriptor, name, length);
+  std::cout << "[S] Received value: \"" << client->receive(25) << "\"" << std::endl;
+  client->send(std::to_string(*client) + " : It's Okay");
+}
 } // namespace core
