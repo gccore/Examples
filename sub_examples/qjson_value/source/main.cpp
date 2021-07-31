@@ -41,47 +41,70 @@ struct my_widget final: QDialog {
     layout->addWidget(m_parse_area);
     setLayout(layout);
   }
+
+
+  enum class array_t { } array_mode;
+  enum class object_t { } object_mode;
+
   void parse_it() const noexcept {
     auto const json = QJsonDocument::fromJson(m_json_area->toPlainText().toUtf8());
-    if (!json.isEmpty() && json.isArray()) {
-      m_parse_area->clear();
-      m_parse_area->setText(parse_json_array(json.array()));
-    } else {
-      m_parse_area->setText("Invalid QJsonArray");
+    if (!json.isEmpty()) {
+      if (json.isArray()) {
+        m_parse_area->clear();
+        m_parse_area->setText(parse_json(json.array(), array_mode));
+      } else if (json.isObject()) {
+        m_parse_area->clear();
+        m_parse_area->setText(parse_json(json.object(), object_mode));
+      } else {
+        m_parse_area->setText("Invalid QJsonArray");
+      }
     }
   }
-  static constexpr auto true_string = "True";
-  static constexpr auto false_string = "False";
-  static constexpr auto null_string = "NULL";
-  static constexpr auto undefined_string = "UNDEFINED";
-  QString parse_json_array(QJsonArray const& json) const noexcept {
+
+  QString parse_json(QJsonObject const& json, object_t) const noexcept {
+    QString result;
+    auto const& keys = json.keys();
+    for (auto const& key : keys) {
+      result += key + " : " + to_string(json[key]) + "\n";
+    }
+    return result;
+  }
+  QString parse_json(QJsonArray const& json, array_t) const noexcept {
     QString result;
     for (auto const& item : json) {
-      switch (item.type()) {
-        case QJsonValue::Null:
-          result += null_string;
-          break;
-        case QJsonValue::Bool:
-          result += item.toBool() ? true_string : false_string;
-          break;
-        case QJsonValue::Double:
-          result += QString::number(item.toDouble());
-          break;
-        case QJsonValue::String:
-          result += item.toString();
-          break;
-        case QJsonValue::Array:
-          result += parse_json_array(item.toArray());
-          break;
-        case QJsonValue::Object: {
-          QJsonDocument const doc(item.toObject());
-          result += doc.toJson(QJsonDocument::Compact);
-        } break;
-        case QJsonValue::Undefined:
-          result += undefined_string;
-          break;
-      }
-      result += '\n';
+      result += to_string(item) + '\n';
+    }
+    return result;
+  }
+
+  static auto constexpr true_string = "True";
+  static auto constexpr false_string = "False";
+  static auto constexpr null_string = "NULL";
+  static auto constexpr undefined_string = "UNDEFINED";
+  QString to_string(QJsonValue const& object) const noexcept {
+    QString result;
+    switch (object.type()) {
+      case QJsonValue::Null:
+        result += null_string;
+        break;
+      case QJsonValue::Bool:
+        result += object.toBool() ? true_string : false_string;
+        break;
+      case QJsonValue::Double:
+        result += QString::number(object.toDouble());
+        break;
+      case QJsonValue::String:
+        result += object.toString();
+        break;
+      case QJsonValue::Array:
+        result += parse_json(object.toArray(), array_mode);
+        break;
+      case QJsonValue::Object: {
+        result += parse_json(object.toObject(), object_mode);
+      } break;
+      case QJsonValue::Undefined:
+        result += undefined_string;
+        break;
     }
     return result;
   }
