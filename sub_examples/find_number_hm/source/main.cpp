@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <gmp.h>
+
 namespace core {
 /*!
  * \brief Reads n number from std::cin until \p terminate given.
@@ -102,6 +104,29 @@ constexpr auto factorial_of(Number const number) noexcept {
   }
   return result;
 }
+
+/*!
+ * \brief Calculates factorial of \p number (big-int version)
+ * \param number
+ * \tparam Number
+ * \returns Returns factorial of \p number
+ */
+template <typename Number>
+auto bfactorial_of(Number const number) noexcept {
+  mpz_t result;
+  mpz_t tmp;
+  mpz_init(result);
+  mpz_init(tmp);
+  mpz_set_ui(result, 1);
+  for (Number i = 1; i <= number; ++i) {
+    mpz_set_ui(tmp, i);
+    mpz_mul(result, result, tmp);
+  }
+  std::string string = mpz_get_str(nullptr, 10, result);
+  mpz_clear(result);
+  mpz_clear(tmp);
+  return string;
+}
 } // namespace math
 } // namespace core
 
@@ -110,10 +135,12 @@ int main() {
   for (auto const number : numbers) {
     if (core::math::is_even(number) &&
         core::math::is_perfect_number(number)) {
-      std::cout << number << ": Is A Perfect Number." << std::endl;
+      std::cout << number << ": Is A Perfect Number, ";
+      std::cout << "Factorial: " << core::math::bfactorial_of(number);
+      std::cout << std::endl;
     } else {
       auto const big_dig = core::algorithm::biggest_digit_of(number);
-      auto const fac = core::math::factorial_of(big_dig);
+      auto const fac = core::math::bfactorial_of(big_dig);
       std::cout << number << ": Biggest Digit: " << big_dig;
       std::cout << ", Factorial: " << fac << std::endl;
     }
