@@ -122,7 +122,9 @@ auto bfactorial_of(Number const number) noexcept {
     mpz_set_ui(tmp, i);
     mpz_mul(result, result, tmp);
   }
-  std::string string = mpz_get_str(nullptr, 10, result);
+  std::string string;
+  string.resize(mpz_sizeinbase(result, 10) + 2);
+  mpz_get_str(string.data(), 10, result);
   mpz_clear(result);
   mpz_clear(tmp);
   return string;
