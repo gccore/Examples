@@ -20,28 +20,60 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 
 namespace config {
 auto constexpr ip = "127.0.0.1";
 auto constexpr port = 54321ULL;
 } // namespace config
 
-namespace server {
-void setup_connection() {
+namespace core::util {
+auto create_address(std::string const& ip) {
   boost::system::error_code error_check;
-  auto const address = boost::asio::ip::address::from_string(config::ip, error_check);
-
+  auto const address = boost::asio::ip::address::from_string(ip, error_check);
   if (error_check.failed()) {
     std::stringstream message;
     message << "Failed to parse IP: " << config::ip << std::endl;
     message << "Error Code: " << error_check.message() << std::endl;
     throw std::runtime_error(message.str());
   }
+  return address;
+}
+} // namespace core::util
 
-  boost::asio::ip::tcp::endpoint endpoint(address, config::port);
+namespace server {
+void setup_connection() {
+  auto const address = boost::asio::ip::address_v6::any();
+  auto const endpoint = boost::asio::ip::tcp::endpoint(address, config::port);
+
+  boost::asio::io_service main_loop;
+  auto const protocol = boost::asio::ip::tcp::v4();
+  boost::asio::ip::tcp::socket socket(main_loop);
+
+  boost::system::error_code error_check;
+  socket.open(protocol, error_check);
+  if (error_check.failed()) {
+    std::stringstream message;
+    message << "Failed to open socket: " << config::port << std::endl;
+    message << "Error Message: " << error_check.message() << std::endl;
+    throw std::runtime_error(message.str());
+  }
+
+
 }
 } // namespace server
 
+namespace client {
+void setup_connection() {
+  boost::asio::ip::tcp::endpoint endpoint(core::util::create_address(config::ip),
+                                          config::port);
+}
+} // namespace client
+
 int main() {
-  server::setup_connection();
+  std::thread _1(server::setup_connection);
+  std::thread _2(client::setup_connection);
+
+  _1.join();
+  _2.join();
 }
