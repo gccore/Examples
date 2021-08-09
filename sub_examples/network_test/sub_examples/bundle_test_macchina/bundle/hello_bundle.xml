@@ -1,0 +1,17 @@
+<bundlespec>
+  <manifest>
+    <name>Ghasem Bundle Test</name>
+    <symbolicName>gc.core.ghasem.test_bundle</symbolicName>
+    <version>0.0.1</version>
+    <vendor>gccore-ag</vendor>
+    <copyright>gccore-ag 2021</copyright>
+    <activator>
+      <class>macchina_test::bundle_test</class>
+      <library>gc.core.ghasem.test_bundle</library>
+    </activator>
+  </manifest>
+  <code>
+    bin/${osName}/${osArch}/*.so,
+    bin/${osName}/${osArch}/*.dylib,
+  </code>
+</bundlespec>

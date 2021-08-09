@@ -16,12 +16,25 @@
  * g1999ramezani@gmail.com
  */
 
-#include <iostream>
+#include <Poco/OSP/BundleActivator.h>
+#include <Poco/OSP/BundleContext.h>
+#include <Poco/ClassLibrary.h>
 
-extern "C" {
-#include <sys/socket.h>
-#include <sys/types.h>
-}
 
-int main() {
-}
+namespace macchina_test {
+class bundle_test: public Poco::OSP::BundleActivator {
+ public:
+  void start(Poco::OSP::BundleContext::Ptr pContext) {
+    pContext->logger().information("Hello, world!");
+  }
+
+  void stop(Poco::OSP::BundleContext::Ptr pContext) {
+    pContext->logger().information("Goodbye!");
+  }
+};
+} // namespace macchina_test
+
+
+POCO_BEGIN_MANIFEST(Poco::OSP::BundleActivator)
+POCO_EXPORT_CLASS(macchina_test::bundle_test)
+POCO_END_MANIFEST
