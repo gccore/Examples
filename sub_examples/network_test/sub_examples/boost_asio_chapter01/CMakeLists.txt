@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.5)
+
+get_filename_component(PROJECT_SELECTED_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+string(REPLACE " " "_" PROJECT_SELECTED_NAME ${PROJECT_SELECTED_NAME})
+project(${PROJECT_SELECTED_NAME} LANGUAGES CXX)
+
+file(GLOB HEADER_ONLY_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.hpp)
+file(GLOB SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+file(GLOB HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.h)
+
+find_package(Boost COMPONENTS system REQUIRED)
+
+add_executable(${PROJECT_NAME} 
+  ${HEADER_ONLY_FILES}
+  ${SOURCE_FILES}
+  ${HEADER_FILES}
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+ Boost::system
+)
