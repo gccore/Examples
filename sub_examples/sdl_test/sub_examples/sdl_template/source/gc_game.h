@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "gc_image.h"
 #include "gc_defs.h"
 
 namespace core
@@ -16,15 +17,15 @@ private:
         states m_state;
         gc_renderer& m_renderer;
         gc_screen& m_screen;
+        gc_image m_background;
 
 public:
         gc_game(gc_renderer& renderer);
-        states execute();
+        void execute();
 
 private:
-        states init();
-        void event(SDL_Event& event);
-        void loop();
+        void init();
+        void event(SDL_Event const& event);
         void render();
         void clean_up();
 };

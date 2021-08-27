@@ -27,6 +27,8 @@ public:
         std::string caption() const;
 
         SDL_Window* window() const;
+
+        void update() const;
 };
 } // namespace core
 

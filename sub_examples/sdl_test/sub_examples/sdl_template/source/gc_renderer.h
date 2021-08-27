@@ -17,6 +17,8 @@ public:
         gc_renderer(gc_screen& window);
         ~gc_renderer();
 
+        void clear_to_blank();
+
         SDL_Renderer* renderer() const;
         gc_screen& screen() const;
 };

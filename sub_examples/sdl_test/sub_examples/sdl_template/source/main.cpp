@@ -27,6 +27,5 @@ int main()
         core::gc_screen screen("SDL Basics");
         core::gc_renderer renderer(screen);
         core::gc_game game(renderer);
-
-        return core::states::success == game.execute() ? EXIT_SUCCESS : EXIT_FAILURE;
+        game.execute();
 }

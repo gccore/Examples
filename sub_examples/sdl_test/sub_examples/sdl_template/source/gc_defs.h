@@ -20,6 +20,7 @@ namespace core::def
 {
 auto constexpr w = 800ULL;
 auto constexpr h = 600ULL;
+auto constexpr res = PROJECT_BINARY_PATH "/res";
 } // namespace core
 
 #endif // GC_SDL_BASICS_DEFS_H

@@ -1,65 +1,67 @@
 #include "gc_game.h"
 
+#include <filesystem>
+#include <stdexcept>
+
 #include "gc_renderer.h"
 #include "gc_screen.h"
+#include "Logger.h"
 
 namespace core
 {
 gc_game::gc_game(gc_renderer& renderer)
         : m_state(states::unknown),
           m_renderer(renderer),
-          m_screen(m_renderer.screen())
+          m_screen(m_renderer.screen()),
+          m_background(m_screen)
 {
 }
 
-states gc_game::execute()
+void gc_game::execute()
 {
-        states state = this->init();
+        init();
 
-        if (states::success == state) {
-                SDL_Event events;
-                this->m_state = states::running;
+        SDL_Event events;
+        m_state = states::running;
+        m_renderer.clear_to_blank();
 
-                while (states::running == this->m_state) {
-                        while (SDL_PollEvent(&events)) {
-                                this->event(events);
-                        }
+        while (states::running == m_state) {
+                render();
+                SDL_WaitEvent(&events);
 
-                        this->loop();
-                        this->render();
+                while (0 != SDL_PollEvent(&events)) {
+                        event(events);
                 }
-
-                this->clean_up();
         }
 
-        return state;
+        clean_up();
 }
 
-states gc_game::init()
+void gc_game::init()
 {
+        LOG_INFO << "Initializing ...";
         if (0 > SDL_Init(SDL_INIT_EVERYTHING)) {
-                return states::failed;
-        }
-        if (nullptr == m_screen.window() ||
-            nullptr == m_renderer.renderer()) {
-                return states::failed;
+                LOG_FATAL << "Couldn't Initialize: " << SDL_GetError();
+                throw std::runtime_error("Couldn't Initialize: "
+                                         + std::string(SDL_GetError()));
         }
 
-
-
-        return states::success;
+        LOG_INFO << "Loading Background.";
+        m_background.load_image(def::res + std::string("/avatar.bmp"));
 }
 
-void gc_game::event(SDL_Event& event)
+void gc_game::event(SDL_Event const& event)
 {
-}
-
-void gc_game::loop()
-{
+        if (SDL_QUIT == event.type) {
+                m_state = states::stopped;
+        }
 }
 
 void gc_game::render()
 {
+//        auto const surface = SDL_GetWindowSurface(m_screen.window());
+//        SDL_FillRect(surface, nullptr, SDL_MapRGB(surface->format, 0xFF, 0xFF, 0xFF));
+        m_screen.update();
 }
 
 void gc_game::clean_up()
