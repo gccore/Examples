@@ -7,14 +7,21 @@
 
 namespace core
 {
-gc_image::gc_image(gc_screen& screen)
-        : m_screen(screen),
-          m_surface(SDL_GetWindowSurface(m_screen.window())),
+gc_image::gc_image()
+        : m_screen(nullptr),
+          m_surface(nullptr),
           m_image_sur(nullptr)
 {
 }
 
-gc_image::gc_image(gc_screen& screen, std::string const& path)
+gc_image::gc_image(gc_screen* screen)
+        : m_screen(screen),
+          m_surface(SDL_GetWindowSurface(m_screen->window())),
+          m_image_sur(nullptr)
+{
+}
+
+gc_image::gc_image(gc_screen* screen, std::string const& path, loads_mod const mode)
         : gc_image(screen)
 {
         if (nullptr == m_surface) {
@@ -23,7 +30,10 @@ gc_image::gc_image(gc_screen& screen, std::string const& path)
         }
         LOG_INFO << "Surface Created.";
 
-        load_image(path);
+        m_path = path;
+        if (loads_mod::immediate == mode) {
+                load_image(path);
+        }
 }
 
 gc_image::~gc_image()
@@ -34,6 +44,16 @@ gc_image::~gc_image()
 
 void gc_image::load_image(std::string const& path)
 {
+        if (nullptr != m_image_sur) {
+                SDL_FreeSurface(m_image_sur);
+                LOG_WARN << "Previously Loaded Image: " << m_path
+                         << " Removed.";
+        }
+        if (nullptr == m_screen) {
+                LOG_ERROR << "Screen Doesn't Exist.";
+                throw std::runtime_error("Screen Doesn't Exist.");
+        }
+
         m_path = path;
         if (!std::filesystem::exists(m_path)) {
                 LOG_ERROR << "Path Not Found: " + m_path;
@@ -51,4 +71,8 @@ void gc_image::load_image(std::string const& path)
         LOG_INFO << "Image Applied.";
 }
 
+void gc_image::load_image()
+{
+        load_image(m_path);
+}
 } // namespace core

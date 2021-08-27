@@ -69,7 +69,7 @@ inline LogStream& operator<<(LogStream& s, const Logger::SourceFile& v)
 using namespace trantor;
 
 static thread_local uint64_t lastSecond_{0};
-static thread_local char lastTimeString_[32] = {0};
+static thread_local char lastTimeString_[35] = {0};
 #ifdef __linux__
 static thread_local pid_t threadId_ {0};
 #else
@@ -96,7 +96,7 @@ void Logger::formatTime()
                                                 sizeof(lastTimeString_) - 1);
 #endif
         }
-        logStream_ << T(lastTimeString_, 17);
+        logStream_ << T(lastTimeString_, 19);
         char tmp[32];
         snprintf(tmp,
                  sizeof(tmp),

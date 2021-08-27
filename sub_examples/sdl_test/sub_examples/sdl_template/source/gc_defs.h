@@ -1,6 +1,8 @@
 #ifndef GC_SDL_BASICS_DEFS_H
 #define GC_SDL_BASICS_DEFS_H
 
+#include <cstddef>
+
 namespace core
 {
 /*!
@@ -14,12 +16,23 @@ enum class states {
         failed,  /*!< Failed operation */
         success  /*!< Successed operation */
 };
+
+namespace keys
+{
+enum keys_t {
+        up,
+        down,
+        left,
+        rigth
+};
+} // namespace keys
+auto constexpr keys_length = keys::rigth + 1;
 } // namespace core
 
 namespace core::def
 {
 auto constexpr w = 800ULL;
-auto constexpr h = 600ULL;
+auto constexpr h = 450ULL;
 auto constexpr res = PROJECT_BINARY_PATH "/res";
 } // namespace core
 
