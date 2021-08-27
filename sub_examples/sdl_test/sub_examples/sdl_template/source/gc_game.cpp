@@ -5,6 +5,7 @@
 
 #include "gc_renderer.h"
 #include "gc_screen.h"
+#include "gc_util.h"
 #include "Logger.h"
 
 namespace core
@@ -48,30 +49,31 @@ void gc_game::init()
                                          + std::string(SDL_GetError()));
         }
 
+        LOG_INFO << "Rendering Images ... ";
         for (std::size_t i = 0; i < m_images.size(); ++i) {
-                gc_image image(&m_screen, m_images_path[i], gc_image::loads_mod::wait);
-                m_images[i] = std::move(image);
+                m_images[i] = gc_image(&m_screen);
+                m_images[i].load_image(m_images_path[i]);
         }
 }
 
 void gc_game::handel_keyboard_events(SDL_Event const& event)
 {
-        m_background.load_image();
+        m_background.render();
         switch (event.key.keysym.sym) {
                 case SDLK_w:
-                        m_images[keys::up].load_image();
+                        m_images[keys::up].render();
                         break;
                 case SDLK_a:
-                        m_images[keys::left].load_image();
+                        m_images[keys::left].render();
                         break;
                 case SDLK_s:
-                        m_images[keys::down].load_image();
+                        m_images[keys::down].render();
                         break;
                 case SDLK_d:
-                        m_images[keys::rigth].load_image();
+                        m_images[keys::rigth].render();
                         break;
                 default:
-                        m_background.load_image();
+                        m_background.render();
                         break;
         }
 }
@@ -97,7 +99,7 @@ void gc_game::clean_up()
 
 void gc_game::load_background()
 {
-        m_background.load_image(def::res + std::string("/background.bmp"));
+        m_background.load_image(util::from_res("background.bmp")).render();
 }
 
 void gc_game::colorize_background()
