@@ -72,6 +72,9 @@ void gc_game::handel_keyboard_events(SDL_Event const& event)
                 case SDLK_d:
                         m_images[keys::rigth].render();
                         break;
+                case SDLK_ESCAPE:
+                        m_state = states::stopped;
+                        break;
                 default:
                         m_background.render();
                         break;
