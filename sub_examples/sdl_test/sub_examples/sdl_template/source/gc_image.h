@@ -27,6 +27,7 @@ public:
         gc_image& load_image();
 
         void render();
+        void render(int const width, int const heigth);
 
 private:
         void deallocate();

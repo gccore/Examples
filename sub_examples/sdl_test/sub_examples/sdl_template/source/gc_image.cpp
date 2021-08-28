@@ -95,6 +95,18 @@ void gc_image::render()
         LOG_INFO << "Image Applied.";
 }
 
+void gc_image::render(int const width, int const heigth)
+{
+        SDL_Rect stretch_rect = {0, 0, width, heigth};
+        if (0 != SDL_BlitScaled(m_image_sur, nullptr, m_surface, &stretch_rect)) {
+                LOG_ERROR << "Couldn't Apply Scaled Image: " << SDL_GetError();
+                throw std::runtime_error("Couldn't Apply Scaled Image: "
+                                         + std::string(SDL_GetError()));
+        }
+
+        LOG_INFO << "Scaled Image Applied.";
+}
+
 void gc_image::deallocate()
 {
         if (nullptr != m_image_sur) {

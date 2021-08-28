@@ -31,8 +31,8 @@ auto constexpr keys_length = keys::rigth + 1;
 
 namespace core::def
 {
-auto constexpr w = 800ULL;
-auto constexpr h = 450ULL;
+auto constexpr w = 900ULL;
+auto constexpr h = 550ULL;
 auto constexpr res = PROJECT_BINARY_PATH "/res";
 } // namespace core
 

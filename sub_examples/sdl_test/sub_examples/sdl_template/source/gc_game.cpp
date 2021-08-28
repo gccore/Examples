@@ -58,7 +58,7 @@ void gc_game::init()
 
 void gc_game::handel_keyboard_events(SDL_Event const& event)
 {
-        m_background.render();
+        m_background.render(def::w, def::h);
         switch (event.key.keysym.sym) {
                 case SDLK_w:
                         m_images[keys::up].render();
@@ -76,7 +76,7 @@ void gc_game::handel_keyboard_events(SDL_Event const& event)
                         m_state = states::stopped;
                         break;
                 default:
-                        m_background.render();
+                        m_background.render(def::w, def::h);
                         break;
         }
 }
@@ -102,7 +102,7 @@ void gc_game::clean_up()
 
 void gc_game::load_background()
 {
-        m_background.load_image(util::from_res("background.bmp")).render();
+        m_background.load_image(util::from_res("background.bmp")).render(def::w, def::h);
 }
 
 void gc_game::colorize_background()
