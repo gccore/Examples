@@ -31,8 +31,11 @@ public:
 
 private:
         void deallocate();
+        void deallocate_previous_image();
         void set_path(std::string const& path);
         void load();
+
+        static std::string error();
 
 };
 } // namespace core

@@ -36,4 +36,22 @@ auto constexpr h = 550ULL;
 auto constexpr res = PROJECT_BINARY_PATH "/res";
 } // namespace core
 
+#define CHECK_NULL(x, m) \
+        if (nullptr == x) { \
+                LOG_FATAL << m; \
+                throw std::runtime_error(m); \
+        }
+
+#define CHECK_FAILED(x, m) \
+        if (0 != x) { \
+                LOG_ERROR << m; \
+                throw std::runtime_error(m); \
+        }
+
+#define CHECK_PATH_EXIST(x) \
+        if (!std::filesystem::exists(x)) { \
+                LOG_ERROR << "Path Not Found: " + x; \
+                throw std::runtime_error("Path Not Found: " + x); \
+        }
+
 #endif // GC_SDL_BASICS_DEFS_H

@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 
+#include <string>
+
 namespace core
 {
 class gc_screen;
@@ -21,6 +23,9 @@ public:
 
         SDL_Renderer* renderer() const;
         gc_screen& screen() const;
+
+private:
+        static std::string error();
 };
 } // namespace core
 

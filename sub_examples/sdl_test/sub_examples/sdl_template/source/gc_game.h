@@ -46,6 +46,8 @@ private:
         void load_background();
         void colorize_background();
         void handel_keyboard_events(SDL_Event const& event);
+
+        static std::string error();
 };
 } // namespace core
 

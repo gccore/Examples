@@ -5,6 +5,7 @@
 
 #include "gc_renderer.h"
 #include "gc_screen.h"
+#include "gc_defs.h"
 #include "gc_util.h"
 #include "Logger.h"
 
@@ -43,11 +44,7 @@ void gc_game::execute()
 void gc_game::init()
 {
         LOG_INFO << "Initializing ...";
-        if (0 > SDL_Init(SDL_INIT_EVERYTHING)) {
-                LOG_FATAL << "Couldn't Initialize: " << SDL_GetError();
-                throw std::runtime_error("Couldn't Initialize: "
-                                         + std::string(SDL_GetError()));
-        }
+        CHECK_FAILED(SDL_Init(SDL_INIT_EVERYTHING), "Couldn't Initialize: " + error());
 
         LOG_INFO << "Rendering Images ... ";
         for (std::size_t i = 0; i < m_images.size(); ++i) {
@@ -79,6 +76,11 @@ void gc_game::handel_keyboard_events(SDL_Event const& event)
                         m_background.render(def::w, def::h);
                         break;
         }
+}
+
+std::string gc_game::error()
+{
+        return SDL_GetError();
 }
 
 void gc_game::event(SDL_Event const& event)

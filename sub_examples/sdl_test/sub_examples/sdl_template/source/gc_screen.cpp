@@ -1,7 +1,9 @@
 #include "gc_screen.h"
-#include "gc_defs.h"
 
 #include <stdexcept>
+
+#include "gc_defs.h"
+#include "Logger.h"
 
 namespace core
 {
@@ -17,10 +19,7 @@ gc_screen::gc_screen(std::string const& caption,
                                     m_width, m_height,
                                     SDL_WINDOW_OPENGL))
 {
-        if (nullptr == m_window) {
-                throw std::runtime_error("Couldn't Create Window: "
-                                         + std::string(SDL_GetError()));
-        }
+        CHECK_NULL(m_window, "Couldn't Create Window: " + error());
 }
 gc_screen::gc_screen(std::string const& caption)
         : gc_screen(caption, def::w, def::h)
@@ -46,5 +45,10 @@ SDL_Window* gc_screen::window() const
 void gc_screen::update() const
 {
         SDL_UpdateWindowSurface(m_window);
+}
+
+std::string gc_screen::error()
+{
+        return SDL_GetError();
 }
 } // namespace core

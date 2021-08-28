@@ -29,6 +29,9 @@ public:
         SDL_Window* window() const;
 
         void update() const;
+
+private:
+        static std::string error();
 };
 } // namespace core
 

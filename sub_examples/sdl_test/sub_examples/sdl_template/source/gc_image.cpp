@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 
 #include "gc_screen.h"
+#include "gc_defs.h"
 #include "Logger.h"
 
 namespace core
@@ -26,12 +27,7 @@ gc_image::gc_image(gc_screen* screen)
 gc_image::gc_image(gc_screen* screen, std::string const& path)
         : gc_image(screen)
 {
-        if (nullptr == m_surface) {
-                LOG_FATAL << "Couldn't Create Surface";
-                throw std::runtime_error("Couldn't Create Surface.");
-        }
-        LOG_INFO << "Surface Created.";
-
+        CHECK_NULL(m_surface, "Couldn't Create Surface");
         set_path(path);
         load_image();
 }
@@ -44,19 +40,21 @@ gc_image::~gc_image()
 
 gc_image& gc_image::load_image(std::string const& path)
 {
-        if (nullptr == m_screen) {
-                LOG_ERROR << "Screen Doesn't Exist.";
-                throw std::runtime_error("Screen Doesn't Exist.");
-        }
+        CHECK_NULL(m_screen, "Screen Doesn't Exist.");
+        deallocate_previous_image();
+        set_path(path);
+        load();
+
+        return *this;
+}
+
+void gc_image::deallocate_previous_image()
+{
         if (nullptr != m_image_sur) {
                 deallocate();
                 LOG_WARN << "Previously Loaded Image: " << m_path
                          << " Released.";
         }
-
-        set_path(path);
-        load();
-        return *this;
 }
 
 gc_image& gc_image::load_image()
@@ -68,41 +66,32 @@ gc_image& gc_image::load_image()
 void gc_image::load()
 {
         auto const image = SDL_LoadBMP(m_path.c_str());
-        if (nullptr == image) {
-                LOG_ERROR << "Couldn't Load BMP: " << SDL_GetError();
-                throw std::runtime_error("Couldn't Load BMP: " + std::string(SDL_GetError()));
-        }
+        CHECK_NULL(image, "Couldn't Load BMP: " + error());
 
         m_image_sur = SDL_ConvertSurface(image, m_surface->format, 0);
-        if (nullptr == m_image_sur) {
-                LOG_ERROR << "Couldn't Convert The Surface: " << SDL_GetError();
-                throw std::runtime_error("Couldn't Convert The Surface: " +
-                                         std::string(SDL_GetError()));
-        }
+        CHECK_NULL(m_image_sur, "The Surface Convert Failed: " + error());
         SDL_FreeSurface(image);
 
         LOG_INFO << "BMP: " + m_path + " Loaded";
 }
 
+std::string gc_image::error()
+{
+        return SDL_GetError();
+}
+
 void gc_image::render()
 {
-        if (0 != SDL_BlitSurface(m_image_sur, nullptr, m_surface, nullptr)) {
-                LOG_ERROR << "Couldn't Apply Image: " << SDL_GetError();
-                throw std::runtime_error("Couldn't Apply Image : "
-                                         + std::string(SDL_GetError()));
-        }
-
+        CHECK_FAILED(SDL_BlitSurface(m_image_sur, nullptr, m_surface, nullptr),
+                     "Couldn't Apply Image: " + error());
         LOG_INFO << "Image Applied.";
 }
 
 void gc_image::render(int const width, int const heigth)
 {
         SDL_Rect stretch_rect = {0, 0, width, heigth};
-        if (0 != SDL_BlitScaled(m_image_sur, nullptr, m_surface, &stretch_rect)) {
-                LOG_ERROR << "Couldn't Apply Scaled Image: " << SDL_GetError();
-                throw std::runtime_error("Couldn't Apply Scaled Image: "
-                                         + std::string(SDL_GetError()));
-        }
+        CHECK_FAILED(SDL_BlitScaled(m_image_sur, nullptr, m_surface, &stretch_rect),
+                     "Couldn't Apply Scaled Image: " + error());
 
         LOG_INFO << "Scaled Image Applied.";
 }
@@ -116,10 +105,7 @@ void gc_image::deallocate()
 
 void gc_image::set_path(std::string const& path)
 {
-        if (!std::filesystem::exists(path)) {
-                LOG_ERROR << "Path Not Found: " + path;
-                throw std::runtime_error("Path Not Found: " + path);
-        }
+        CHECK_PATH_EXIST(path);
         m_path = path;
 }
 } // namespace core
