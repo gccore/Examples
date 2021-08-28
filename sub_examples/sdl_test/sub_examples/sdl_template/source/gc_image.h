@@ -1,8 +1,10 @@
 ﻿#ifndef GC_SDL_BASICS_GC_IMAGE_H
 #define GC_SDL_BASICS_GC_IMAGE_H
 
+#include <memory>
 #include <string>
 
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
 
 namespace core
@@ -30,13 +32,22 @@ public:
         void render(int const width, int const heigth);
 
 private:
+        struct surface_deleter_t final {
+                void operator()(SDL_Surface* ptr) const;
+        };
+        using image_ptr_t = std::unique_ptr<SDL_Surface, surface_deleter_t>;
+
+private:
         void deallocate();
         void deallocate_previous_image();
         void set_path(std::string const& path);
         void load();
+        image_ptr_t load_bmp();
+        image_ptr_t load_png();
+        void convert_surface(image_ptr_t&& image);
 
         static std::string error();
-
+        static std::string p_error();
 };
 } // namespace core
 

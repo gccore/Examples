@@ -1,8 +1,7 @@
 #include "gc_image.h"
 
 #include <filesystem>
-
-#include <SDL2/SDL.h>
+#include <array>
 
 #include "gc_screen.h"
 #include "gc_defs.h"
@@ -38,16 +37,6 @@ gc_image::~gc_image()
         deallocate();
 }
 
-gc_image& gc_image::load_image(std::string const& path)
-{
-        CHECK_NULL(m_screen, "Screen Doesn't Exist.");
-        deallocate_previous_image();
-        set_path(path);
-        load();
-
-        return *this;
-}
-
 void gc_image::deallocate_previous_image()
 {
         if (nullptr != m_image_sur) {
@@ -63,21 +52,57 @@ gc_image& gc_image::load_image()
         return *this;
 }
 
+gc_image& gc_image::load_image(std::string const& path)
+{
+        CHECK_NULL(m_screen, "Screen Doesn't Exist.");
+        deallocate_previous_image();
+        set_path(path);
+        load();
+
+        return *this;
+}
+
 void gc_image::load()
 {
-        auto const image = SDL_LoadBMP(m_path.c_str());
+        auto const prefix = std::filesystem::path(m_path).extension();
+        if (".bmp" == prefix) {
+                convert_surface(load_bmp());
+        } else if (".png" == prefix) {
+                convert_surface(load_png());
+        } else {
+                ERROR("Unknown Prefx: " + prefix.string());
+        }
+}
+
+gc_image::image_ptr_t gc_image::load_bmp()
+{
+        image_ptr_t image(SDL_LoadBMP(m_path.c_str()));
         CHECK_NULL(image, "Couldn't Load BMP: " + error());
+        return image;
+}
 
-        m_image_sur = SDL_ConvertSurface(image, m_surface->format, 0);
+gc_image::image_ptr_t gc_image::load_png()
+{
+        image_ptr_t image(IMG_Load(m_path.c_str()));
+        CHECK_NULL(image, "Couldn't Load PNG: " + p_error());
+        return image;
+}
+
+void gc_image::convert_surface(image_ptr_t&& image)
+{
+        m_image_sur = SDL_ConvertSurface(image.get(), m_surface->format, 0);
         CHECK_NULL(m_image_sur, "The Surface Convert Failed: " + error());
-        SDL_FreeSurface(image);
-
-        LOG_INFO << "BMP: " + m_path + " Loaded";
+        LOG_INFO << "Image Loaded: " << m_path;
 }
 
 std::string gc_image::error()
 {
         return SDL_GetError();
+}
+
+std::string gc_image::p_error()
+{
+        return IMG_GetError();
 }
 
 void gc_image::render()
@@ -107,5 +132,10 @@ void gc_image::set_path(std::string const& path)
 {
         CHECK_PATH_EXIST(path);
         m_path = path;
+}
+
+void gc_image::surface_deleter_t::operator()(SDL_Surface* ptr) const
+{
+        SDL_FreeSurface(ptr);
 }
 } // namespace core

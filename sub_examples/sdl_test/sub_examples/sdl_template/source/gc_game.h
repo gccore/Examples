@@ -21,10 +21,10 @@ private:
 
         static inline constexpr
         std::array<char const*, keys_length> m_images_path = {
-                PROJECT_BINARY_PATH "/res/up.bmp",
-                PROJECT_BINARY_PATH "/res/down.bmp",
-                PROJECT_BINARY_PATH "/res/left.bmp",
-                PROJECT_BINARY_PATH "/res/right.bmp",
+                PROJECT_BINARY_PATH "/res/up.png",
+                PROJECT_BINARY_PATH "/res/down.png",
+                PROJECT_BINARY_PATH "/res/left.png",
+                PROJECT_BINARY_PATH "/res/right.png",
         };
 
 private:

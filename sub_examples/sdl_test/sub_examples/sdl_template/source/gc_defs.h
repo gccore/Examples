@@ -54,4 +54,8 @@ auto constexpr res = PROJECT_BINARY_PATH "/res";
                 throw std::runtime_error("Path Not Found: " + x); \
         }
 
+#define ERROR(x) \
+        LOG_FATAL << x; \
+        throw std::runtime_error(x);
+
 #endif // GC_SDL_BASICS_DEFS_H
