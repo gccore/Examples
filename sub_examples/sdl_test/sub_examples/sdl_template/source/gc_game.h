@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "gc_texture.h"
 #include "gc_image.h"
 #include "gc_defs.h"
 
@@ -17,7 +18,7 @@ class gc_game
 {
 private:
         template <std::size_t Length>
-        using gc_image_list = std::array<gc_image, Length>;
+        using gc_texture_list = std::array<gc_texture, Length>;
 
         static inline constexpr
         std::array<char const*, keys_length> m_images_path = {
@@ -31,8 +32,8 @@ private:
         states m_state;
         gc_renderer& m_renderer;
         gc_screen& m_screen;
-        gc_image m_background;
-        gc_image_list<keys_length> m_images;
+        gc_texture m_background;
+        gc_texture_list<keys_length> m_textures;
 
 public:
         gc_game(gc_renderer& renderer);
@@ -41,13 +42,13 @@ public:
 private:
         void init();
         void event(SDL_Event const& event);
-        void render();
         void clean_up();
         void load_background();
-        void colorize_background();
         void handel_keyboard_events(SDL_Event const& event);
+        bool is_valid_event_type(SDL_Event const& event);
 
         static std::string error();
+        static std::string p_error();
 };
 } // namespace core
 

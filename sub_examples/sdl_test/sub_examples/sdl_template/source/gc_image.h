@@ -7,6 +7,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
 
+#include "gc_types.h"
+
 namespace core
 {
 class gc_screen;
@@ -25,23 +27,17 @@ public:
         gc_image(gc_screen* screen, std::string const& path);
         ~gc_image();
 
-        gc_image& load_image(std::string const& path);
-        gc_image& load_image();
+        gc_image& load(std::string const& path);
+        gc_image& load();
 
         void render();
         void render(int const width, int const heigth);
 
 private:
-        struct surface_deleter_t final {
-                void operator()(SDL_Surface* ptr) const;
-        };
-        using image_ptr_t = std::unique_ptr<SDL_Surface, surface_deleter_t>;
-
-private:
         void deallocate();
         void deallocate_previous_image();
         void set_path(std::string const& path);
-        void load();
+        void load_by_prefix();
         image_ptr_t load_bmp();
         image_ptr_t load_png();
         void convert_surface(image_ptr_t&& image);

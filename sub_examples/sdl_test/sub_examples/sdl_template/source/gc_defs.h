@@ -1,7 +1,11 @@
 #ifndef GC_SDL_BASICS_DEFS_H
 #define GC_SDL_BASICS_DEFS_H
 
+#include <filesystem>
+#include <stdexcept>
 #include <cstddef>
+
+#include "Logger.h"
 
 namespace core
 {
@@ -44,6 +48,12 @@ auto constexpr res = PROJECT_BINARY_PATH "/res";
 
 #define CHECK_FAILED(x, m) \
         if (0 != x) { \
+                LOG_ERROR << m; \
+                throw std::runtime_error(m); \
+        }
+
+#define CHECK_FAILED_2(x, m) \
+        if (x) { \
                 LOG_ERROR << m; \
                 throw std::runtime_error(m); \
         }

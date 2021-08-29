@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # -fsanitize=address
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -pedantic-errors -fsanitize=address")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -pedantic-errors")
 
 file(GLOB SUB_EXAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/sub_examples/*)
 foreach(EXAMPLE ${SUB_EXAMPLES})

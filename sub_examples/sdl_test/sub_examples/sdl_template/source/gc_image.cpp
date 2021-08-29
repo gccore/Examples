@@ -28,7 +28,7 @@ gc_image::gc_image(gc_screen* screen, std::string const& path)
 {
         CHECK_NULL(m_surface, "Couldn't Create Surface");
         set_path(path);
-        load_image();
+        load();
 }
 
 gc_image::~gc_image()
@@ -46,23 +46,23 @@ void gc_image::deallocate_previous_image()
         }
 }
 
-gc_image& gc_image::load_image()
+gc_image& gc_image::load()
 {
-        load_image(m_path);
+        load(m_path);
         return *this;
 }
 
-gc_image& gc_image::load_image(std::string const& path)
+gc_image& gc_image::load(std::string const& path)
 {
         CHECK_NULL(m_screen, "Screen Doesn't Exist.");
         deallocate_previous_image();
         set_path(path);
-        load();
+        load_by_prefix();
 
         return *this;
 }
 
-void gc_image::load()
+void gc_image::load_by_prefix()
 {
         auto const prefix = std::filesystem::path(m_path).extension();
         if (".bmp" == prefix) {
@@ -74,14 +74,14 @@ void gc_image::load()
         }
 }
 
-gc_image::image_ptr_t gc_image::load_bmp()
+image_ptr_t gc_image::load_bmp()
 {
         image_ptr_t image(SDL_LoadBMP(m_path.c_str()));
         CHECK_NULL(image, "Couldn't Load BMP: " + error());
         return image;
 }
 
-gc_image::image_ptr_t gc_image::load_png()
+image_ptr_t gc_image::load_png()
 {
         image_ptr_t image(IMG_Load(m_path.c_str()));
         CHECK_NULL(image, "Couldn't Load PNG: " + p_error());
@@ -132,10 +132,5 @@ void gc_image::set_path(std::string const& path)
 {
         CHECK_PATH_EXIST(path);
         m_path = path;
-}
-
-void gc_image::surface_deleter_t::operator()(SDL_Surface* ptr) const
-{
-        SDL_FreeSurface(ptr);
 }
 } // namespace core

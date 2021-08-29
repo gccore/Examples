@@ -20,10 +20,13 @@ gc_renderer::~gc_renderer()
         SDL_DestroyRenderer(m_renderer);
 }
 
-void gc_renderer::clear_to_blank()
+void gc_renderer::clear()
 {
-        SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
         SDL_RenderClear(m_renderer);
+}
+
+void gc_renderer::update()
+{
         SDL_RenderPresent(m_renderer);
 }
 
