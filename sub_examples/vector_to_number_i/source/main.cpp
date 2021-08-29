@@ -27,11 +27,11 @@ namespace core
 {
 static mpz_class convert_to_i(std::vector<std::size_t> const& vec)
 {
-        mpz_class result = 1;
+        std::string sum;
         for (auto const number : vec) {
-                result *= number;
+                sum += std::to_string(number);
         }
-        return result;
+        return mpz_class(sum.c_str());
 }
 } // namespace core
 
