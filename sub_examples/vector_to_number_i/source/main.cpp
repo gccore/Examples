@@ -33,6 +33,15 @@ static mpz_class convert_to_i(std::vector<std::size_t> const& vec)
         }
         return mpz_class(sum);
 }
+
+static mpz_class convert_to_i(std::vector<mpz_class> const& vec)
+{
+        std::string sum;
+        for (auto const& number : vec) {
+                sum += number.get_str();
+        }
+        return mpz_class(sum);
+}
 } // namespace core
 
 static std::ostream& operator<<(std::ostream& out, mpz_class const& in)
@@ -48,4 +57,10 @@ int main()
                 1173029487328219238
         };
         std::cout << core::convert_to_i(vec) << std::endl;
+
+        std::vector<mpz_class> const vec_2 = {
+                mpz_class("26316943474706436812631694347470643681"),
+                mpz_class("263169434747064368126316943474706436812631694347470643681")
+        };
+        std::cout << core::convert_to_i(vec_2) << std::endl;
 }
