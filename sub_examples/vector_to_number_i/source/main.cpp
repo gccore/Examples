@@ -31,7 +31,7 @@ static mpz_class convert_to_i(std::vector<std::size_t> const& vec)
         for (auto const number : vec) {
                 sum += std::to_string(number);
         }
-        return mpz_class(sum.c_str());
+        return mpz_class(sum);
 }
 } // namespace core
 
