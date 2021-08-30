@@ -40,6 +40,11 @@ void gc_game::execute()
 
 void gc_game::init()
 {
+
+}
+
+void gc_game::init_tagv1()
+{
         LOG_INFO << "Initializing ...";
         CHECK_FAILED(SDL_Init(SDL_INIT_EVERYTHING), "Couldn't Initialize: " + error());
 
@@ -51,6 +56,11 @@ void gc_game::init()
                 m_textures[i] = gc_texture(&m_renderer);
                 m_textures[i].load(m_images_path[i]);
         }
+}
+
+void gc_game::event(SDL_Event const& event)
+{
+
 }
 
 void gc_game::handel_keyboard_events(SDL_Event const& event)
@@ -92,7 +102,7 @@ std::string gc_game::p_error()
         return IMG_GetError();
 }
 
-void gc_game::event(SDL_Event const& event)
+void gc_game::event_tagv1(SDL_Event const& event)
 {
         if (SDL_QUIT == event.type) {
                 m_state = states::stopped;
