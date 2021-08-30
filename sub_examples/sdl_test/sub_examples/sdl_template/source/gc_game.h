@@ -41,7 +41,9 @@ public:
 
 private:
         void init();
+        void init_tagv1();
         void event(SDL_Event const& event);
+        void event_tagv1(SDL_Event const& event);
         void clean_up();
         void load_background();
         void handel_keyboard_events(SDL_Event const& event);
