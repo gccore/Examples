@@ -22,17 +22,16 @@ gc_game::gc_game(gc_renderer& renderer)
 void gc_game::execute()
 {
         init();
-        load_background();
 
         SDL_Event events;
-        m_state = states::running;
         while (states::running == m_state) {
-                SDL_WaitEvent(&events);
-                if (is_valid_event_type(events)) {
-                        m_renderer.clear();
-                        event(events);
-                        m_renderer.update();
+                while (0 != SDL_PollEvent(&events)) {
+                        if (is_valid_event_type(events)) {
+                                event(events);
+                        }
                 }
+                render_rectangle();
+                m_renderer.update();
         }
 
         clean_up();
@@ -40,7 +39,14 @@ void gc_game::execute()
 
 void gc_game::init()
 {
+        CHECK_WARNING(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"),
+                      "Linear Texture Filtering Not Enabled.");
+        CHECK_WARNING(0 != SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0xFF, 0xFF, 0xFF),
+                      "Couldn't Set Render Draw Color: " + error());
 
+        load_background();
+        m_renderer.clear();
+        m_state = states::running;
 }
 
 void gc_game::init_tagv1()
@@ -118,6 +124,13 @@ void gc_game::event_tagv1(SDL_Event const& event)
 void gc_game::clean_up()
 {
         SDL_Quit();
+}
+
+void gc_game::render_rectangle()
+{
+        SDL_Rect constexpr fillRect = { def::w / 4, def::h / 4, def::w / 2, def::h / 2 };
+        SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0x00, 0x00, 0xFF);
+        SDL_RenderFillRect(m_renderer.renderer(), &fillRect);
 }
 
 void gc_game::load_background()

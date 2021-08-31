@@ -58,6 +58,11 @@ auto constexpr res = PROJECT_BINARY_PATH "/res";
                 throw std::runtime_error(m); \
         }
 
+#define CHECK_WARNING(x, m) \
+        if (x) { \
+                LOG_WARN << m; \
+        }
+
 #define CHECK_PATH_EXIST(x) \
         if (!std::filesystem::exists(x)) { \
                 LOG_ERROR << "Path Not Found: " + x; \
