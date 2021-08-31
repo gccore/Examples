@@ -22,10 +22,10 @@ gc_game::gc_game(gc_renderer& renderer)
 void gc_game::execute()
 {
         init();
-        m_state = states::running;
         load_background();
 
         SDL_Event events;
+        m_state = states::running;
         while (states::running == m_state) {
                 SDL_WaitEvent(&events);
                 if (is_valid_event_type(events)) {
@@ -60,7 +60,11 @@ void gc_game::init_tagv1()
 
 void gc_game::event(SDL_Event const& event)
 {
-
+        switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                        m_state = states::stopped;
+                        break;
+        }
 }
 
 void gc_game::handel_keyboard_events(SDL_Event const& event)
@@ -89,7 +93,7 @@ void gc_game::handel_keyboard_events(SDL_Event const& event)
 
 bool gc_game::is_valid_event_type(const SDL_Event& event)
 {
-        return SDL_QUIT == event.type || SDL_KEYDOWN == event.type;
+        return (SDL_QUIT == event.type) || (SDL_KEYDOWN == event.type);
 }
 
 std::string gc_game::error()
@@ -117,6 +121,11 @@ void gc_game::clean_up()
 }
 
 void gc_game::load_background()
+{
+        SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0xFF, 0xFF, 0xFF);
+}
+
+void gc_game::load_background_tagv1()
 {
         m_background.load(util::from_res("background.bmp")).render();
 }

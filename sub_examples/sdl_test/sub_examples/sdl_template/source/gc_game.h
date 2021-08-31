@@ -46,6 +46,7 @@ private:
         void event_tagv1(SDL_Event const& event);
         void clean_up();
         void load_background();
+        void load_background_tagv1();
         void handel_keyboard_events(SDL_Event const& event);
         bool is_valid_event_type(SDL_Event const& event);
 
