@@ -25,13 +25,12 @@ void gc_game::execute()
 
         SDL_Event events;
         while (states::running == m_state) {
-                while (0 != SDL_PollEvent(&events)) {
-                        if (is_valid_event_type(events)) {
-                                event(events);
-                        }
+                SDL_WaitEvent(&events);
+                if (is_valid_event_type(events)) {
+                        event(events);
+                        render_rectangle();
+                        m_renderer.update();
                 }
-                render_rectangle();
-                m_renderer.update();
         }
 
         clean_up();
@@ -131,6 +130,14 @@ void gc_game::render_rectangle()
         SDL_Rect constexpr fillRect = { def::w / 4, def::h / 4, def::w / 2, def::h / 2 };
         SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0x00, 0x00, 0xFF);
         SDL_RenderFillRect(m_renderer.renderer(), &fillRect);
+
+        SDL_SetRenderDrawColor(m_renderer.renderer(), 0x00, 0x00, 0xFF, 0xFF);
+        SDL_RenderDrawLine(m_renderer.renderer(), 0, def::h / 2, def::w, def::h / 2);
+
+        SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0xFF, 0x00, 0xFF);
+        for (std::size_t i = 0; i < def::h; i += 4) {
+                SDL_RenderDrawPoint(m_renderer.renderer(), def::w / 2, i);
+        }
 }
 
 void gc_game::load_background()
