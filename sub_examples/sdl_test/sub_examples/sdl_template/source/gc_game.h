@@ -42,13 +42,16 @@ public:
 private:
         void init();
         void init_tagv1();
-        void event(SDL_Event const& event);
+        void process_events(SDL_Event const& event);
         void event_tagv1(SDL_Event const& event);
         void clean_up();
         void render_rectangle();
+        void render_viewport();
         void load_background();
         void load_background_tagv1();
         void handel_keyboard_events(SDL_Event const& event);
+        bool is_quite_event_type(SDL_Event const& event);
+        void check_for_exit(SDL_Event const& event);
         bool is_valid_event_type(SDL_Event const& event);
 
         static std::string error();
