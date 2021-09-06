@@ -82,16 +82,24 @@ void gc_game::handel_keyboard_events(SDL_Event const& event)
 	switch (event.key.keysym.sym)
 	{
 		case SDLK_w:
-			m_textures[keys::up].render();
+			m_head_pos.y -= 10;
+			m_textures[keys::up].render(m_head_pos);
 			break;
 		case SDLK_a:
-			m_textures[keys::left].render();
+			m_head_pos.x -= 10;
+			m_textures[keys::left].render(m_head_pos);
 			break;
 		case SDLK_s:
-			m_textures[keys::down].render();
+			m_head_pos.y += 10;
+			m_textures[keys::down].render(m_head_pos);
 			break;
 		case SDLK_d:
-			m_textures[keys::rigth].render();
+			m_head_pos.x += 10;
+			m_textures[keys::rigth].render(m_head_pos);
+			break;
+		case SDLK_q:
+			m_head_pos.y = def::h / 2;
+			m_head_pos.x = def::w / 2;
 			break;
 		case SDLK_ESCAPE:
 			m_state = states::stopped;

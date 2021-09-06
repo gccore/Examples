@@ -40,6 +40,27 @@ namespace core::def
 auto constexpr w = 900ULL;
 auto constexpr h = 550ULL;
 auto constexpr res = PROJECT_BINARY_PATH "/res";
+} // namespace core::def
+
+namespace core
+{
+struct size_t final
+{
+	std::size_t width = 0ULL;
+	std::size_t height = 0ULL;
+};
+struct pos_t final
+{
+	int x = 0;
+	int y = 0;
+
+	pos_t& operator*(int const i)
+	{
+		x *= i;
+		y *= i;
+		return *this;
+	}
+};
 } // namespace core
 
 #define CHECK_NULL(x, m) \
