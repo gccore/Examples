@@ -152,6 +152,7 @@ void gc_game::event_tagv1(SDL_Event const& event)
 
 void gc_game::clean_up()
 {
+	IMG_Quit();
 	SDL_Quit();
 }
 
