@@ -21,16 +21,16 @@ gc_game::gc_game(gc_renderer& renderer)
 
 void gc_game::execute()
 {
-	init();
+	init_tagv1();
 	SDL_Event event;
 	while (states::running == m_state)
 	{
+		load_background_tagv1();
 		SDL_WaitEvent(&event);
 		check_for_exit(event);
 		if (is_valid_event_type(event))
 		{
-			process_events(event);
-			render_viewport();
+			handel_keyboard_events(event);
 			m_renderer.update();
 		}
 	}
@@ -56,11 +56,15 @@ void gc_game::init_tagv1()
 	int image_flag = IMG_INIT_PNG;
 	CHECK_FAILED_2(!(IMG_Init(image_flag) & image_flag), "Couldn't Initialize: " + p_error());
 	LOG_INFO << "Rendering Images ... ";
+	m_state = states::running;
 	for (std::size_t i = 0; i < m_textures.size(); ++i)
 	{
 		m_textures[i] = gc_texture(&m_renderer);
 		m_textures[i].load(m_images_path[i]);
 	}
+
+	load_background_tagv1();
+	m_renderer.update();
 }
 
 void gc_game::process_events(SDL_Event const& event)
