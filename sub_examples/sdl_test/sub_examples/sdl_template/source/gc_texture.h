@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "gc_ptr.hpp"
 #include "gc_defs.h"
 
 namespace core
@@ -28,8 +29,9 @@ public:
 	gc_texture& load(std::string const& path);
 	gc_texture& load();
 
-	void render(core::pos_t const pos);
-	void render();
+	void render(core::pos_t const pos,
+		    gc_ptr<SDL_Rect> const& rect = nullptr);
+	void render(gc_ptr<SDL_Rect> const& rect = nullptr);
 
 private:
 	static std::string p_error();

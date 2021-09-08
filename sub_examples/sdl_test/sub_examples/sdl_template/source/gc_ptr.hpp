@@ -17,7 +17,7 @@ public:
 		: ptr(&in)
 	{
 	}
-	explicit gc_ptr(T* in) noexcept
+	gc_ptr(T* in) noexcept
 		: ptr(in)
 	{
 	}

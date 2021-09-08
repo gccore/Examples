@@ -54,6 +54,12 @@ struct pos_t final
 	int x = 0;
 	int y = 0;
 
+	pos_t() = default;
+	pos_t(int const x_, int const y_)
+		: x(x_), y(y_)
+	{
+	}
+
 	pos_t& operator*(int const i)
 	{
 		x *= i;

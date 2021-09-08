@@ -37,6 +37,9 @@ private:
 	gc_texture_list<keys_length> m_textures;
 	core::pos_t m_head_pos;
 
+	std::array<SDL_Rect, 4> m_sprite_clips;
+	gc_texture m_sprite_texture;
+
 public:
 	gc_game(gc_renderer& renderer);
 	void execute();
@@ -55,6 +58,9 @@ private:
 	bool is_quite_event_type(SDL_Event const& event);
 	void check_for_exit(SDL_Event const& event);
 	bool is_valid_event_type(SDL_Event const& event);
+	void load_back_sprite();
+	void render_sprites();
+	void render_white_background();
 
 	static std::string error();
 	static std::string p_error();

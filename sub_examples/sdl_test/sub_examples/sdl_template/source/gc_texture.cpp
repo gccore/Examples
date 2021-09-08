@@ -51,9 +51,11 @@ gc_texture& gc_texture::load()
 	LOG_INFO << "Loading Texture: " << m_path;
 
 	image_ptr_t surface(IMG_Load(m_path.c_str()));
-	CHECK_NULL(surface, "Couldn't Load Texture: " + m_path + ". Error : " + p_error());
+	CHECK_NULL(surface, "Couldn't Load Texture: " + m_path
+		   + ". Error : " + p_error());
 
-	m_texture = SDL_CreateTextureFromSurface(m_renderer->renderer(), surface.get());
+	m_texture = SDL_CreateTextureFromSurface(m_renderer->renderer(),
+			surface.get());
 	CHECK_NULL(m_texture, "Couldn't Load Texture: " + error());
 	m_size.width = surface->w;
 	m_size.height = surface->h;
@@ -61,24 +63,33 @@ gc_texture& gc_texture::load()
 	return *this;
 }
 
-void gc_texture::render(core::pos_t const pos)
+void gc_texture::render(core::pos_t const pos, gc_ptr<SDL_Rect> const& rect)
 {
 	LOG_INFO << "Rendering Texture: " << m_path;
-	SDL_Rect const render_quad =
+	SDL_Rect render_quad =
 	{
 		pos.x, pos.y,
 		static_cast<int>(m_size.width),
 		static_cast<int>(m_size.height)
 	};
-	CHECK_FAILED(SDL_RenderCopy(m_renderer->renderer(), m_texture, nullptr, &render_quad),
-		     "Couldn't Render Texture: " + m_path + ". Error: " + error());
+	if (nullptr != rect)
+	{
+		render_quad.w = rect->w;
+		render_quad.h = rect->h;
+	}
+	CHECK_FAILED(SDL_RenderCopy(m_renderer->renderer(), m_texture,
+				    rect.data(), &render_quad),
+		     "Couldn't Render Texture: " + m_path
+		     + ". Error: " + error());
 }
 
-void gc_texture::render()
+void gc_texture::render(gc_ptr<SDL_Rect> const& rect)
 {
 	LOG_INFO << "Rendering Texture: " << m_path;
-	CHECK_FAILED(SDL_RenderCopy(m_renderer->renderer(), m_texture, nullptr, nullptr),
-		     "Couldn't Render Texture: " + m_path + ". Error: " + error());
+	CHECK_FAILED(SDL_RenderCopy(m_renderer->renderer(), m_texture,
+				    rect.data(), nullptr),
+		     "Couldn't Render Texture: " + m_path
+		     + ". Error: " + error());
 }
 
 std::string gc_texture::p_error()

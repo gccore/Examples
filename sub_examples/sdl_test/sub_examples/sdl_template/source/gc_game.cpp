@@ -15,7 +15,8 @@ gc_game::gc_game(gc_renderer& renderer)
 	: m_state(states::unknown),
 	  m_renderer(renderer),
 	  m_screen(m_renderer.screen()),
-	  m_background(&m_renderer)
+	  m_background(&m_renderer),
+	  m_sprite_texture(&m_renderer, util::from_res("sprites.png"))
 {
 }
 
@@ -23,8 +24,18 @@ void gc_game::execute()
 {
 	init_tagv1();
 	SDL_Event event;
+	load_back_sprite();
 	while (states::running == m_state)
 	{
+		SDL_WaitEvent(&event);
+		if (is_valid_event_type(event))
+		{
+			handel_keyboard_events(event);
+		}
+		render_white_background();
+		render_sprites();
+		m_renderer.update();
+#if 0
 		load_background_tagv1();
 		SDL_WaitEvent(&event);
 		check_for_exit(event);
@@ -33,6 +44,7 @@ void gc_game::execute()
 			handel_keyboard_events(event);
 			m_renderer.update();
 		}
+#endif
 	}
 	clean_up();
 }
@@ -126,6 +138,32 @@ void gc_game::check_for_exit(SDL_Event const& event)
 bool gc_game::is_valid_event_type(SDL_Event const& event)
 {
 	return SDL_KEYDOWN == event.type;
+}
+
+void gc_game::load_back_sprite()
+{
+	m_sprite_clips[0] = {0, 0, 100, 100};
+	m_sprite_clips[1] = {100, 0, 100, 100};
+	m_sprite_clips[2] = {0, 100, 100, 100};
+	m_sprite_clips[3] = {100, 100, 100, 100};
+}
+
+void gc_game::render_sprites()
+{
+	m_sprite_texture.render({0, 0}, &m_sprite_clips[0]);
+	m_sprite_texture.render({static_cast<int>(def::w - m_sprite_clips[1].w), 0},
+				&m_sprite_clips[1]);
+	m_sprite_texture.render({0, static_cast<int>(def::h - m_sprite_clips[2].h)},
+				&m_sprite_clips[2]);
+	m_sprite_texture.render({static_cast<int>(def::w - m_sprite_clips[3].w),
+				 static_cast<int>(def::h - m_sprite_clips[3].h)},
+				&m_sprite_clips[3]);
+}
+
+void gc_game::render_white_background()
+{
+	SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0xFF, 0xFF, 0xFF);
+	m_renderer.clear();
 }
 
 std::string gc_game::error()
