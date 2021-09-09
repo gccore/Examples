@@ -14,13 +14,13 @@ class gc_renderer;
 
 class gc_texture
 {
-private:
+    private:
 	gc_renderer* m_renderer;
 	SDL_Texture* m_texture;
 	std::string m_path;
 	core::size_t m_size;
 
-public:
+    public:
 	gc_texture();
 	gc_texture(gc_renderer* renderer);
 	gc_texture(gc_renderer* renderer, std::string const& path);
@@ -29,11 +29,10 @@ public:
 	gc_texture& load(std::string const& path);
 	gc_texture& load();
 
-	void render(core::pos_t const pos,
-		    gc_ptr<SDL_Rect> const& rect = nullptr);
+	void render(core::pos_t const pos, gc_ptr<SDL_Rect> const& rect = nullptr);
 	void render(gc_ptr<SDL_Rect> const& rect = nullptr);
 
-private:
+    private:
 	static std::string p_error();
 	static std::string error();
 };

@@ -18,8 +18,8 @@ enum class states
 	stopped, /*!< Stopped by something */
 	running, /*!< On the way */
 	unknown, /*!< Initial state */
-	failed,  /*!< Failed operation */
-	success  /*!< Successed operation */
+	failed, /*!< Failed operation */
+	success /*!< Successed operation */
 };
 
 namespace keys
@@ -56,7 +56,8 @@ struct pos_t final
 
 	pos_t() = default;
 	pos_t(int const x_, int const y_)
-		: x(x_), y(y_)
+		: x(x_)
+		, y(y_)
 	{
 	}
 
@@ -69,37 +70,42 @@ struct pos_t final
 };
 } // namespace core
 
-#define CHECK_NULL(x, m) \
-	if (nullptr == x) { \
-		LOG_FATAL << m; \
-		throw std::runtime_error(m); \
+#define CHECK_NULL(x, m)                                                                           \
+	if(nullptr == x)                                                                           \
+	{                                                                                          \
+		LOG_FATAL << m;                                                                    \
+		throw std::runtime_error(m);                                                       \
 	}
 
-#define CHECK_FAILED(x, m) \
-	if (0 != x) { \
-		LOG_ERROR << m; \
-		throw std::runtime_error(m); \
+#define CHECK_FAILED(x, m)                                                                         \
+	if(0 != x)                                                                                 \
+	{                                                                                          \
+		LOG_ERROR << m;                                                                    \
+		throw std::runtime_error(m);                                                       \
 	}
 
-#define CHECK_FAILED_2(x, m) \
-	if (x) { \
-		LOG_ERROR << m; \
-		throw std::runtime_error(m); \
+#define CHECK_FAILED_2(x, m)                                                                       \
+	if(x)                                                                                      \
+	{                                                                                          \
+		LOG_ERROR << m;                                                                    \
+		throw std::runtime_error(m);                                                       \
 	}
 
-#define CHECK_WARNING(x, m) \
-	if (x) { \
-		LOG_WARN << m; \
+#define CHECK_WARNING(x, m)                                                                        \
+	if(x)                                                                                      \
+	{                                                                                          \
+		LOG_WARN << m;                                                                     \
 	}
 
-#define CHECK_PATH_EXIST(x) \
-	if (!std::filesystem::exists(x)) { \
-		LOG_ERROR << "Path Not Found: " + x; \
-		throw std::runtime_error("Path Not Found: " + x); \
+#define CHECK_PATH_EXIST(x)                                                                        \
+	if(!std::filesystem::exists(x))                                                            \
+	{                                                                                          \
+		LOG_ERROR << "Path Not Found: " + x;                                               \
+		throw std::runtime_error("Path Not Found: " + x);                                  \
 	}
 
-#define ERROR(x) \
-	LOG_FATAL << x; \
+#define ERROR(x)                                                                                   \
+	LOG_FATAL << x;                                                                            \
 	throw std::runtime_error(x);
 
 #endif // GC_SDL_BASICS_DEFS_H

@@ -7,11 +7,12 @@
 
 namespace core
 {
-struct surface_deleter_t final {
-        inline void operator()(SDL_Surface* ptr) const
-        {
-                SDL_FreeSurface(ptr);
-        }
+struct surface_deleter_t final
+{
+	inline void operator()(SDL_Surface* ptr) const
+	{
+		SDL_FreeSurface(ptr);
+	}
 };
 using image_ptr_t = std::unique_ptr<SDL_Surface, surface_deleter_t>;
 } // namespace core

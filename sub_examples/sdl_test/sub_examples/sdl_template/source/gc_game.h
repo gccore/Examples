@@ -16,20 +16,18 @@ class gc_screen;
 
 class gc_game
 {
-private:
-	template <std::size_t Length>
+    private:
+	template<std::size_t Length>
 	using gc_texture_list = std::array<gc_texture, Length>;
 
-	static inline constexpr
-	std::array<char const*, keys_length> m_images_path =
-	{
+	static inline constexpr std::array<char const*, keys_length> m_images_path = {
 		PROJECT_BINARY_PATH "/res/up.png",
 		PROJECT_BINARY_PATH "/res/down.png",
 		PROJECT_BINARY_PATH "/res/left.png",
 		PROJECT_BINARY_PATH "/res/right.png",
 	};
 
-private:
+    private:
 	states m_state;
 	gc_renderer& m_renderer;
 	gc_screen& m_screen;
@@ -40,11 +38,11 @@ private:
 	std::array<SDL_Rect, 4> m_sprite_clips;
 	gc_texture m_sprite_texture;
 
-public:
+    public:
 	gc_game(gc_renderer& renderer);
 	void execute();
 
-private:
+    private:
 	void init();
 	void init_tagv1();
 	void process_events(SDL_Event const& event);

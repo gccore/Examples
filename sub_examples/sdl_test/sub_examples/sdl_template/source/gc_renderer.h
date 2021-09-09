@@ -11,22 +11,22 @@ class gc_screen;
 
 class gc_renderer
 {
-private:
-        gc_screen& m_screen;
-        SDL_Renderer* m_renderer;
+    private:
+	gc_screen& m_screen;
+	SDL_Renderer* m_renderer;
 
-public:
-        gc_renderer(gc_screen& window);
-        ~gc_renderer();
+    public:
+	gc_renderer(gc_screen& window);
+	~gc_renderer();
 
-        void clear();
-        void update();
+	void clear();
+	void update();
 
-        SDL_Renderer* renderer() const;
-        gc_screen& screen() const;
+	SDL_Renderer* renderer() const;
+	gc_screen& screen() const;
 
-private:
-        static std::string error();
+    private:
+	static std::string error();
 };
 } // namespace core
 

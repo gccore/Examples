@@ -15,13 +15,13 @@ class gc_screen;
 
 class gc_image
 {
-private:
+    private:
 	gc_screen* m_screen;
 	SDL_Surface* m_surface;
 	SDL_Surface* m_image_sur;
 	std::string m_path;
 
-public:
+    public:
 	gc_image();
 	gc_image(gc_screen* screen);
 	gc_image(gc_screen* screen, std::string const& path);
@@ -33,7 +33,7 @@ public:
 	void render();
 	void render(int const width, int const heigth);
 
-private:
+    private:
 	void deallocate();
 	void deallocate_previous_image();
 	void set_path(std::string const& path);

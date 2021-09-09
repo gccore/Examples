@@ -3,12 +3,12 @@
 
 namespace core
 {
-template <typename T>
+template<typename T>
 class gc_ptr final
 {
 	T* ptr = nullptr;
 
-public:
+    public:
 	gc_ptr() noexcept
 		: ptr(nullptr)
 	{

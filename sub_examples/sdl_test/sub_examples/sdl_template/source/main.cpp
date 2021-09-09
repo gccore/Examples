@@ -24,8 +24,10 @@
 
 int main()
 {
-        core::gc_screen screen("SDL Basics");
-        core::gc_renderer renderer(screen);
-        core::gc_game game(renderer);
-        game.execute();
+	core::gc_screen screen("SDL Basics");
+	core::gc_renderer renderer(screen);
+	core::gc_game game(renderer);
+	game.execute();
+
+	return EXIT_SUCCESS;
 }
