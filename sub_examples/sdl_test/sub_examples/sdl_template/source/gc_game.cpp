@@ -17,6 +17,7 @@ gc_game::gc_game(gc_renderer& renderer)
 	, m_screen(m_renderer.screen())
 	, m_background(&m_renderer)
 	, m_sprite_texture(&m_renderer, util::from_res("sprites.png"))
+	, m_modulated_texture(&m_renderer)
 {
 }
 
@@ -25,15 +26,19 @@ void gc_game::execute()
 	init_tagv1();
 	SDL_Event event;
 	load_back_sprite();
+	color_t color = {0xFF, 0xFF, 0xFF};
+	m_modulated_texture.load(util::from_res("color_module.png"));
 	while(states::running == m_state)
 	{
 		SDL_WaitEvent(&event);
+		check_for_exit(event);
 		if(is_valid_event_type(event))
 		{
-			handel_keyboard_events(event);
+			handel_keyboard_color_events(event, color);
 		}
 		render_white_background();
-		render_sprites();
+		m_modulated_texture.set_color(color);
+		m_modulated_texture.render();
 		m_renderer.update();
 #if 0
 		load_background_tagv1();
@@ -122,6 +127,35 @@ void gc_game::handel_keyboard_events(SDL_Event const& event)
 	}
 }
 
+void gc_game::handel_keyboard_color_events(SDL_Event const& event, color_t& color)
+{
+	if(SDL_KEYDOWN == event.type)
+	{
+		auto constexpr step = 32U;
+		switch(event.key.keysym.sym)
+		{
+		case SDLK_q:
+			color.red += step;
+			break;
+		case SDLK_a:
+			color.red -= step;
+			break;
+		case SDLK_w:
+			color.green += step;
+			break;
+		case SDLK_s:
+			color.green -= step;
+			break;
+		case SDLK_e:
+			color.blue += step;
+			break;
+		case SDLK_d:
+			color.blue -= step;
+			break;
+		}
+	}
+}
+
 bool gc_game::is_quite_event_type(SDL_Event const& event)
 {
 	return SDL_QUIT == event.type;
@@ -129,9 +163,12 @@ bool gc_game::is_quite_event_type(SDL_Event const& event)
 
 void gc_game::check_for_exit(SDL_Event const& event)
 {
-	if(is_quite_event_type(event))
+	if(SDL_KEYDOWN == event.type)
 	{
-		m_state = states::stopped;
+		if(SDLK_ESCAPE == event.key.keysym.sym)
+		{
+			m_state = states::stopped;
+		}
 	}
 }
 

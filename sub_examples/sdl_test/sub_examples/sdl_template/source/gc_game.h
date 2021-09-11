@@ -38,6 +38,8 @@ class gc_game
 	std::array<SDL_Rect, 4> m_sprite_clips;
 	gc_texture m_sprite_texture;
 
+	gc_texture m_modulated_texture;
+
     public:
 	gc_game(gc_renderer& renderer);
 	void execute();
@@ -53,6 +55,7 @@ class gc_game
 	void load_background();
 	void load_background_tagv1();
 	void handel_keyboard_events(SDL_Event const& event);
+	void handel_keyboard_color_events(SDL_Event const& event, color_t& color);
 	bool is_quite_event_type(SDL_Event const& event);
 	void check_for_exit(SDL_Event const& event);
 	bool is_valid_event_type(SDL_Event const& event);

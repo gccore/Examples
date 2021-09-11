@@ -68,6 +68,12 @@ struct pos_t final
 		return *this;
 	}
 };
+struct color_t final
+{
+	std::uint8_t red;
+	std::uint8_t green;
+	std::uint8_t blue;
+};
 } // namespace core
 
 #define CHECK_NULL(x, m)                                                                           \

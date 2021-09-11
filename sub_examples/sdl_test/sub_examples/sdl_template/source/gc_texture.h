@@ -19,6 +19,7 @@ class gc_texture
 	SDL_Texture* m_texture;
 	std::string m_path;
 	core::size_t m_size;
+	color_t m_color;
 
     public:
 	gc_texture();
@@ -28,6 +29,9 @@ class gc_texture
 
 	gc_texture& load(std::string const& path);
 	gc_texture& load();
+
+	void set_color(color_t const& color);
+	color_t get_color() const;
 
 	void render(core::pos_t const pos, gc_ptr<SDL_Rect> const& rect = nullptr);
 	void render(gc_ptr<SDL_Rect> const& rect = nullptr);
