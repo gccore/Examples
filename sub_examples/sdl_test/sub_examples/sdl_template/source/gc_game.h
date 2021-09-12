@@ -40,6 +40,8 @@ class gc_game
 
 	gc_texture m_modulated_texture;
 
+	gc_texture m_alpha_texture;
+
     public:
 	gc_game(gc_renderer& renderer);
 	void execute();
@@ -56,12 +58,14 @@ class gc_game
 	void load_background_tagv1();
 	void handel_keyboard_events(SDL_Event const& event);
 	void handel_keyboard_color_events(SDL_Event const& event, color_t& color);
+	void handel_keyboard_alpha_event(SDL_Event const& event, alpha_t& alpha);
 	bool is_quite_event_type(SDL_Event const& event);
 	void check_for_exit(SDL_Event const& event);
 	bool is_valid_event_type(SDL_Event const& event);
 	void load_back_sprite();
 	void render_sprites();
 	void render_white_background();
+	void load_alpha_texture();
 
 	static std::string error();
 	static std::string p_error();

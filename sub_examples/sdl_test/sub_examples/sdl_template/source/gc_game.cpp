@@ -18,6 +18,7 @@ gc_game::gc_game(gc_renderer& renderer)
 	, m_background(&m_renderer)
 	, m_sprite_texture(&m_renderer, util::from_res("sprites.png"))
 	, m_modulated_texture(&m_renderer)
+	, m_alpha_texture(&m_renderer)
 {
 }
 
@@ -25,20 +26,18 @@ void gc_game::execute()
 {
 	init_tagv1();
 	SDL_Event event;
-	load_back_sprite();
-	color_t color = {0xFF, 0xFF, 0xFF};
-	m_modulated_texture.load(util::from_res("color_module.png"));
+	alpha_t alpha = 0xFF;
+	load_background_tagv1();
+	load_alpha_texture();
+	m_alpha_texture.set_blend_mode(SDL_BLENDMODE_BLEND);
 	while(states::running == m_state)
 	{
 		SDL_WaitEvent(&event);
 		check_for_exit(event);
-		if(is_valid_event_type(event))
-		{
-			handel_keyboard_color_events(event, color);
-		}
-		render_white_background();
-		m_modulated_texture.set_color(color);
-		m_modulated_texture.render();
+		handel_keyboard_alpha_event(event, alpha);
+		m_background.render();
+		m_alpha_texture.set_alpha(alpha);
+		m_alpha_texture.render();
 		m_renderer.update();
 #if 0
 		load_background_tagv1();
@@ -156,6 +155,23 @@ void gc_game::handel_keyboard_color_events(SDL_Event const& event, color_t& colo
 	}
 }
 
+void gc_game::handel_keyboard_alpha_event(SDL_Event const& event, alpha_t& alpha)
+{
+	if(SDL_KEYDOWN == event.type)
+	{
+		auto constexpr step = 32U;
+		switch(event.key.keysym.sym)
+		{
+		case SDLK_w:
+			alpha = (0xFF <= alpha + step) ? 0xFF : alpha + step;
+			break;
+		case SDLK_s:
+			alpha = (0 >= alpha - step) ? 0 : alpha - step;
+			break;
+		}
+	}
+}
+
 bool gc_game::is_quite_event_type(SDL_Event const& event)
 {
 	return SDL_QUIT == event.type;
@@ -201,6 +217,11 @@ void gc_game::render_white_background()
 {
 	SDL_SetRenderDrawColor(m_renderer.renderer(), 0xFF, 0xFF, 0xFF, 0xFF);
 	m_renderer.clear();
+}
+
+void gc_game::load_alpha_texture()
+{
+	m_alpha_texture.load(util::from_res("alpha100.png"));
 }
 
 std::string gc_game::error()

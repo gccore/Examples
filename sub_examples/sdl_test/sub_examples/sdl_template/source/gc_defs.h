@@ -44,6 +44,7 @@ auto constexpr res = PROJECT_BINARY_PATH "/res";
 
 namespace core
 {
+using alpha_t = std::uint8_t;
 struct size_t final
 {
 	std::size_t width = 0ULL;

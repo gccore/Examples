@@ -12,6 +12,8 @@ gc_texture::gc_texture()
 	: m_renderer(nullptr)
 	, m_texture(nullptr)
 	, m_color({0xFF, 0xFF, 0xFF})
+	, m_blend_mode(SDL_BLENDMODE_NONE)
+	, m_alpha(0xFF)
 {
 }
 
@@ -19,6 +21,8 @@ gc_texture::gc_texture(gc_renderer* renderer)
 	: m_renderer(renderer)
 	, m_texture(nullptr)
 	, m_color({0xFF, 0xFF, 0xFF})
+	, m_blend_mode(SDL_BLENDMODE_NONE)
+	, m_alpha(0xFF)
 {
 	CHECK_NULL(m_renderer, "Couldn't Accept NULL GC_Renderer.");
 }
@@ -28,6 +32,8 @@ gc_texture::gc_texture(gc_renderer* renderer, std::string const& path)
 	, m_texture(nullptr)
 	, m_path(path)
 	, m_color({0xFF, 0xFF, 0xFF})
+	, m_blend_mode(SDL_BLENDMODE_NONE)
+	, m_alpha(0xFF)
 {
 	CHECK_NULL(m_renderer, "Couldn't Accept NULL GC_Renderer.");
 	CHECK_PATH_EXIST(m_path);
@@ -66,6 +72,28 @@ gc_texture& gc_texture::load()
 	return *this;
 }
 
+void gc_texture::set_blend_mode(SDL_BlendMode const mode)
+{
+	m_blend_mode = mode;
+	SDL_SetTextureBlendMode(m_texture, m_blend_mode);
+}
+
+SDL_BlendMode gc_texture::get_blend_mode() const
+{
+	return m_blend_mode;
+}
+
+void gc_texture::set_alpha(alpha_t const alpha)
+{
+	m_alpha = alpha;
+	SDL_SetTextureAlphaMod(m_texture, m_alpha);
+}
+
+alpha_t gc_texture::get_alpha() const
+{
+	return m_alpha;
+}
+
 void gc_texture::set_color(color_t const& color)
 {
 	m_color = color;
@@ -81,8 +109,8 @@ color_t gc_texture::get_color() const
 void gc_texture::render(core::pos_t const pos, gc_ptr<SDL_Rect> const& rect)
 {
 	LOG_INFO << "Rendering Texture: " << m_path;
-	SDL_Rect render_quad = {pos.x, pos.y, static_cast<int>(m_size.width),
-				static_cast<int>(m_size.height)};
+	SDL_Rect render_quad = {
+		pos.x, pos.y, static_cast<int>(m_size.width), static_cast<int>(m_size.height)};
 	if(nullptr != rect)
 	{
 		render_quad.w = rect->w;

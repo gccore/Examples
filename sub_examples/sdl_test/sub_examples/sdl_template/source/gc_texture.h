@@ -20,6 +20,8 @@ class gc_texture
 	std::string m_path;
 	core::size_t m_size;
 	color_t m_color;
+	SDL_BlendMode m_blend_mode;
+	alpha_t m_alpha;
 
     public:
 	gc_texture();
@@ -29,6 +31,12 @@ class gc_texture
 
 	gc_texture& load(std::string const& path);
 	gc_texture& load();
+
+	void set_blend_mode(SDL_BlendMode const mode);
+	SDL_BlendMode get_blend_mode() const;
+
+	void set_alpha(alpha_t const alpha);
+	alpha_t get_alpha() const;
 
 	void set_color(color_t const& color);
 	color_t get_color() const;
