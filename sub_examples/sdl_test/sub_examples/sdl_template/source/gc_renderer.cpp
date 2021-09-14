@@ -10,7 +10,8 @@ namespace core
 {
 gc_renderer::gc_renderer(gc_screen& window)
 	: m_screen(window)
-	, m_renderer(SDL_CreateRenderer(m_screen.window(), -1, SDL_RENDERER_PRESENTVSYNC))
+	, m_renderer(SDL_CreateRenderer(m_screen.window(), -1,
+					SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))
 {
 	CHECK_NULL(m_renderer, "Couldn't Create Renderer: " + error());
 }

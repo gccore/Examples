@@ -19,6 +19,7 @@ gc_game::gc_game(gc_renderer& renderer)
 	, m_sprite_texture(&m_renderer, util::from_res("sprites.png"))
 	, m_modulated_texture(&m_renderer)
 	, m_alpha_texture(&m_renderer)
+	, m_sprite_sheet_texture(&m_renderer)
 {
 }
 
@@ -26,19 +27,30 @@ void gc_game::execute()
 {
 	init_tagv1();
 	SDL_Event event;
-	alpha_t alpha = 0xFF;
 	load_background_tagv1();
-	load_alpha_texture();
-	m_alpha_texture.set_blend_mode(SDL_BLENDMODE_BLEND);
+	load_foo_animation();
+
+	std::size_t frame = 0;
+
 	while(states::running == m_state)
 	{
 		SDL_WaitEvent(&event);
 		check_for_exit(event);
-		handel_keyboard_alpha_event(event, alpha);
+
 		m_background.render();
-		m_alpha_texture.set_alpha(alpha);
-		m_alpha_texture.render();
+
+		auto const current_frame = &m_animation_sprite_clips[frame / 4];
+		core::pos_t const position((def::w - current_frame->w) / 2,
+					   (def::h - current_frame->h) / 2);
+		m_sprite_sheet_texture.render(position, current_frame);
+
 		m_renderer.update();
+
+		frame += 1;
+		if(total_frames <= frame / 4)
+		{
+			frame = 0;
+		}
 #if 0
 		load_background_tagv1();
 		SDL_WaitEvent(&event);
@@ -222,6 +234,16 @@ void gc_game::render_white_background()
 void gc_game::load_alpha_texture()
 {
 	m_alpha_texture.load(util::from_res("alpha100.png"));
+	m_alpha_texture.set_blend_mode(SDL_BLENDMODE_BLEND);
+}
+
+void gc_game::load_foo_animation()
+{
+	m_sprite_sheet_texture.load(util::from_res("foo.png"));
+	m_animation_sprite_clips[0] = {0, 0, 64, 205};
+	m_animation_sprite_clips[1] = {64, 0, 64, 205};
+	m_animation_sprite_clips[2] = {128, 0, 64, 205};
+	m_animation_sprite_clips[3] = {196, 0, 64, 205};
 }
 
 std::string gc_game::error()

@@ -42,6 +42,10 @@ class gc_game
 
 	gc_texture m_alpha_texture;
 
+	static auto constexpr total_frames = 4ULL;
+	std::array<SDL_Rect, total_frames> m_animation_sprite_clips;
+	gc_texture m_sprite_sheet_texture;
+
     public:
 	gc_game(gc_renderer& renderer);
 	void execute();
@@ -66,6 +70,7 @@ class gc_game
 	void render_sprites();
 	void render_white_background();
 	void load_alpha_texture();
+	void load_foo_animation();
 
 	static std::string error();
 	static std::string p_error();
