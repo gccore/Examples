@@ -18,11 +18,16 @@
 
 #include <QQmlApplicationEngine>
 #include <QApplication>
+#include <QQmlContext>
+
+#include "data_source.h"
 
 int main(int argc, char* argv[])
 {
 	QApplication application(argc, argv);
+	data_source ds;
 	QQmlApplicationEngine engine;
 	engine.load("qrc:/main.qml");
+	engine.rootContext()->setContextProperty("dataSource", &ds);
 	return application.exec();
 }
