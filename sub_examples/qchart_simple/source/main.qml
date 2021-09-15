@@ -40,7 +40,7 @@ ApplicationWindow
                 Timer
                 {
                         id: refreshTimer
-                        interval: 1 / 60 * 1000 // 60 Hz
+                        interval: 1
                         running: true
                         repeat: true
                         onTriggered:

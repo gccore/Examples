@@ -1,7 +1,10 @@
 #include "data_source.h"
 
 #include <QRandomGenerator>
+#include <QElapsedTimer>
 #include <QXYSeries>
+#include <QtMath>
+#include <QTime>
 
 data_source::data_source(QObject* parent)
 	: QObject(parent)
@@ -51,12 +54,24 @@ void data_source::update(QAbstractSeries* series)
 	if(series)
 	{
 		QXYSeries* xySeries = static_cast<QXYSeries*>(series);
-		m_index++;
-		if(m_index > m_data.count() - 1)
-			m_index = 0;
 
-		QList<QPointF> points = m_data.at(m_index);
-		// Use replace instead of clear + append, it's optimized for performance
-		xySeries->replace(points);
+		static QElapsedTimer time;
+		static bool first = true;
+		if(first)
+		{
+			time.start();
+			first = false;
+		}
+		double key = time.elapsed() / 1000.0;
+		static double lastPointKey = 0;
+
+		if(key - lastPointKey > 0.002)
+		{
+			QPointF point(key,
+				      qSin(key) + std::rand() / static_cast<double>(RAND_MAX) * 1 *
+							  qSin(key / 0.3843));
+			lastPointKey = key;
+			xySeries->append(point);
+		}
 	}
 }
