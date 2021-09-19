@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/qml_pass_id_example">
+        <file>main.qml</file>
+    </qresource>
+</RCC>
