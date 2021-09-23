@@ -37,8 +37,8 @@ auto constexpr keys_length = keys::rigth + 1;
 
 namespace core::def
 {
-auto constexpr w = 900ULL;
-auto constexpr h = 550ULL;
+auto constexpr w = 900;
+auto constexpr h = 550;
 auto constexpr res = PROJECT_BINARY_PATH "/res";
 } // namespace core::def
 
@@ -47,8 +47,8 @@ namespace core
 using alpha_t = std::uint8_t;
 struct size_t final
 {
-	std::size_t width = 0ULL;
-	std::size_t height = 0ULL;
+	int width = 0ULL;
+	int height = 0ULL;
 };
 struct pos_t final
 {

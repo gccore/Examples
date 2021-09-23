@@ -25,42 +25,25 @@ gc_game::gc_game(gc_renderer& renderer)
 
 void gc_game::execute()
 {
-	init_tagv1();
 	SDL_Event event;
-	load_background_tagv1();
-	load_foo_animation();
+	init_tagv2();
 
-	std::size_t frame = 0;
+	double degree = 0.0;
+	SDL_RendererFlip flip_mode = SDL_FLIP_NONE;
 
 	while(states::running == m_state)
 	{
 		SDL_WaitEvent(&event);
 		check_for_exit(event);
-
-		m_background.render();
-
-		auto const current_frame = &m_animation_sprite_clips[frame / 4];
-		core::pos_t const position((def::w - current_frame->w) / 2,
-					   (def::h - current_frame->h) / 2);
-		m_sprite_sheet_texture.render(position, current_frame);
-
+		handel_keyboard_flip_event(event, degree, flip_mode);
+		render_white_background();
+		m_head.render({(def::w - m_head.get_size().width) / 2,
+			       (def::h - m_head.get_size().height) / 2},
+			      nullptr,
+			      degree,
+			      nullptr,
+			      flip_mode);
 		m_renderer.update();
-
-		frame += 1;
-		if(total_frames <= frame / 4)
-		{
-			frame = 0;
-		}
-#if 0
-		load_background_tagv1();
-		SDL_WaitEvent(&event);
-		check_for_exit(event);
-		if (is_valid_event_type(event))
-		{
-			handel_keyboard_events(event);
-			m_renderer.update();
-		}
-#endif
 	}
 	clean_up();
 }
@@ -92,6 +75,19 @@ void gc_game::init_tagv1()
 	}
 
 	load_background_tagv1();
+	m_renderer.update();
+}
+
+void gc_game::init_tagv2()
+{
+	LOG_INFO << "Initializing ...";
+	CHECK_FAILED(SDL_Init(SDL_INIT_EVERYTHING), "Couldn't Initialize: " + error());
+	int image_flag = IMG_INIT_PNG;
+	CHECK_FAILED_2(!(IMG_Init(image_flag) & image_flag), "Couldn't Initialize: " + p_error());
+	LOG_INFO << "Rendering Image ...";
+	m_state = states::running;
+	m_head = gc_texture(&m_renderer);
+	m_head.load(m_images_path[0]);
 	m_renderer.update();
 }
 
@@ -179,6 +175,31 @@ void gc_game::handel_keyboard_alpha_event(SDL_Event const& event, alpha_t& alpha
 			break;
 		case SDLK_s:
 			alpha = (0 >= alpha - step) ? 0 : alpha - step;
+			break;
+		}
+	}
+}
+
+void gc_game::handel_keyboard_flip_event(SDL_Event const& event,
+					 double& degree,
+					 SDL_RendererFlip& flip)
+{
+	if(SDL_KEYDOWN == event.type)
+	{
+		auto constexpr degree_step = 10;
+		switch(event.key.keysym.sym)
+		{
+		case SDLK_a:
+			degree -= degree_step;
+			break;
+		case SDLK_d:
+			degree += degree_step;
+			break;
+		case SDLK_w:
+			flip = SDL_FLIP_NONE;
+			break;
+		case SDLK_s:
+			flip = SDL_FLIP_VERTICAL;
 			break;
 		}
 	}

@@ -46,6 +46,8 @@ class gc_game
 	std::array<SDL_Rect, total_frames> m_animation_sprite_clips;
 	gc_texture m_sprite_sheet_texture;
 
+	gc_texture m_head;
+
     public:
 	gc_game(gc_renderer& renderer);
 	void execute();
@@ -53,6 +55,7 @@ class gc_game
     private:
 	void init();
 	void init_tagv1();
+	void init_tagv2();
 	void process_events(SDL_Event const& event);
 	void event_tagv1(SDL_Event const& event);
 	void clean_up();
@@ -63,6 +66,8 @@ class gc_game
 	void handel_keyboard_events(SDL_Event const& event);
 	void handel_keyboard_color_events(SDL_Event const& event, color_t& color);
 	void handel_keyboard_alpha_event(SDL_Event const& event, alpha_t& alpha);
+	void handel_keyboard_flip_event(SDL_Event const& event, double& degree,
+					SDL_RendererFlip& flip);
 	bool is_quite_event_type(SDL_Event const& event);
 	void check_for_exit(SDL_Event const& event);
 	bool is_valid_event_type(SDL_Event const& event);

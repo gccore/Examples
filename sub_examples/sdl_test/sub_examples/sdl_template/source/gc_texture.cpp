@@ -106,11 +106,35 @@ color_t gc_texture::get_color() const
 	return m_color;
 }
 
+size_t gc_texture::get_size() const
+{
+	return m_size;
+}
+
+void gc_texture::render(pos_t const pos, gc_ptr<SDL_Rect> const& clip, double const angle,
+			gc_ptr<SDL_Point> const& center, SDL_RendererFlip const flip_mode)
+{
+	LOG_INFO << "Rendering Texture: " << m_path;
+	SDL_Rect render_quad = {pos.x, pos.y, m_size.width, m_size.height};
+	if(nullptr != clip)
+	{
+		render_quad.w = clip->w;
+		render_quad.h = clip->h;
+	}
+	CHECK_FAILED(SDL_RenderCopyEx(m_renderer->renderer(),
+				      m_texture,
+				      clip.data(),
+				      &render_quad,
+				      angle,
+				      center.data(),
+				      flip_mode),
+		     "Couldn't Render Texture: " + m_path + ". Error: " + error());
+}
+
 void gc_texture::render(core::pos_t const pos, gc_ptr<SDL_Rect> const& rect)
 {
 	LOG_INFO << "Rendering Texture: " << m_path;
-	SDL_Rect render_quad = {
-		pos.x, pos.y, static_cast<int>(m_size.width), static_cast<int>(m_size.height)};
+	SDL_Rect render_quad = {pos.x, pos.y, m_size.width, m_size.height};
 	if(nullptr != rect)
 	{
 		render_quad.w = rect->w;

@@ -41,6 +41,10 @@ class gc_texture
 	void set_color(color_t const& color);
 	color_t get_color() const;
 
+	core::size_t get_size() const;
+
+	void render(core::pos_t const pos, gc_ptr<SDL_Rect> const& clip, double const angle,
+		    gc_ptr<SDL_Point> const& center, SDL_RendererFlip const flip_mode);
 	void render(core::pos_t const pos, gc_ptr<SDL_Rect> const& rect = nullptr);
 	void render(gc_ptr<SDL_Rect> const& rect = nullptr);
 
