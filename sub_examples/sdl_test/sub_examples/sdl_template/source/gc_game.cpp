@@ -237,12 +237,9 @@ void gc_game::load_back_sprite()
 void gc_game::render_sprites()
 {
 	m_sprite_texture.render({0, 0}, &m_sprite_clips[0]);
-	m_sprite_texture.render({static_cast<int>(def::w - m_sprite_clips[1].w), 0},
-				&m_sprite_clips[1]);
-	m_sprite_texture.render({0, static_cast<int>(def::h - m_sprite_clips[2].h)},
-				&m_sprite_clips[2]);
-	m_sprite_texture.render({static_cast<int>(def::w - m_sprite_clips[3].w),
-				 static_cast<int>(def::h - m_sprite_clips[3].h)},
+	m_sprite_texture.render({def::w - m_sprite_clips[1].w, 0}, &m_sprite_clips[1]);
+	m_sprite_texture.render({0, def::h - m_sprite_clips[2].h}, &m_sprite_clips[2]);
+	m_sprite_texture.render({def::w - m_sprite_clips[3].w, def::h - m_sprite_clips[3].h},
 				&m_sprite_clips[3]);
 }
 
