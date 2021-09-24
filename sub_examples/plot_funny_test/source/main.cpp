@@ -23,35 +23,29 @@
 
 double get_y(double const x)
 {
-	return x * 2 + 1;
+	return x * x;
 }
 
 int main(int argc, char* argv[])
 {
 	QApplication application(argc, argv);
 	QCustomPlot plot;
-	plot.setMaximumSize(800, 500);
-	plot.setMinimumSize(800, 500);
+	plot.setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iMultiSelect |
+			     QCP::iSelectPlottables | QCP::iSelectAxes | QCP::iSelectLegend |
+			     QCP::iSelectItems | QCP::iSelectOther |
+			     QCP::iSelectPlottablesBeyondAxisRect);
 	plot.legend->setVisible(true);
 	plot.addGraph();
 	QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
 	timeTicker->setTimeFormat("%h:%m:%s");
 	plot.xAxis->setTicker(timeTicker);
 	plot.axisRect()->setupFullAxesBox();
-	QTimer generator;
-	QObject::connect(&generator, &QTimer::timeout, &application, [&plot] {
-		static auto const begin = QTime::currentTime();
-		double x_key = begin.msecsTo(QTime::currentTime());
-		plot.graph()->addData(x_key, get_y(x_key));
-		auto data = plot.graph()->data();
-		if(data->size() > 100)
-		{
-			data->remove(data->begin()[0].key);
-		}
-		plot.rescaleAxes();
-		plot.replot(QCustomPlot::rpQueuedReplot);
-	});
-	generator.start(100);
+	for(double i = -1000; i < 1000; ++i)
+	{
+		plot.graph()->addData(i, get_y(i));
+	}
+	plot.rescaleAxes();
+	plot.replot(QCustomPlot::rpQueuedReplot);
 	plot.show();
 	return application.exec();
 }
