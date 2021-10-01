@@ -24,25 +24,22 @@
 
 inline QChar constexpr pctoe(QChar const pchar)
 {
-	std::array<QChar, 10> constexpr p =
+	std::array<QChar, 20> constexpr p =
 	{
 		QChar(L'\u06F0'), QChar(L'\u06F1'),
 		QChar(L'\u06F2'), QChar(L'\u06F3'),
 		QChar(L'\u06F4'), QChar(L'\u06F5'),
 		QChar(L'\u06F6'), QChar(L'\u06F7'),
 		QChar(L'\u06F8'), QChar(L'\u06F9'),
-	};
-	std::array<QChar, 10> constexpr e =
-	{
 		'0', '1', '2', '3',
 		'4', '5', '6', '7',
 		'8', '9'
 	};
-	for (std::size_t i = 0; i < p.size(); ++i)
+	for (std::size_t i = 0; i < 10; ++i)
 	{
 		if (p[i] == pchar)
 		{
-			return e[i];
+			return p[i + 10];
 		}
 	}
 	return pchar;
