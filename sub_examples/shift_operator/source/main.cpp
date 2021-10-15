@@ -20,11 +20,14 @@
 #include <iostream>
 #include <string>
 
-enum class direction_right { };
-enum class direction_left { };
+namespace directions
+{
+enum class right { };
+enum class left { };
+} // namespace direction
 
 template <typename Container>
-void shift(Container& data, std::size_t ratio, direction_right)
+void shift(Container& data, std::size_t ratio, directions::right)
 {
 	for (; ratio != 0; --ratio)
 	{
@@ -34,7 +37,7 @@ void shift(Container& data, std::size_t ratio, direction_right)
 	}
 }
 template <typename Container>
-void shift(Container& data, std::size_t ratio, direction_left)
+void shift(Container& data, std::size_t ratio, directions::left)
 {
 	for (; ratio != 0; --ratio)
 	{
@@ -47,11 +50,11 @@ void shift(Container& data, std::size_t ratio, direction_left)
 int main()
 {
 	std::string string = "hello";
-	shift(string, 2, direction_left());
+	shift(string, 2, directions::left());
 	std::cout << string << std::endl;
 
 	std::vector<std::string> strings = {"_1", "_2", "_3"};
-	shift(strings, 2, direction_right());
+	shift(strings, 2, directions::right());
 	for (auto const& item : strings)
 	{
 		std::cout << item << ", ";
