@@ -46,7 +46,15 @@ void shift(Container& data, std::size_t ratio, direction_left)
 
 int main()
 {
-	std::string string = "ghasem";
-	shift(string, 2, direction_right());
+	std::string string = "hello";
+	shift(string, 2, direction_left());
 	std::cout << string << std::endl;
+
+	std::vector<std::string> strings = {"_1", "_2", "_3"};
+	shift(strings, 2, direction_right());
+	for (auto const& item : strings)
+	{
+		std::cout << item << ", ";
+	}
+	std::cout << std::endl;
 }
