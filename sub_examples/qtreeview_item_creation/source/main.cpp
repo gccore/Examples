@@ -24,10 +24,11 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QSpinBox>
-#include <QLabel>
+#include <QPointer>
 #include <QWidget>
+#include <QLabel>
 
-struct my_widget final: QWidget
+struct my_widget final : QWidget
 {
 	QPointer<QTreeWidget> m_list = new QTreeWidget;
 	QPointer<QPushButton> m_add_children = new QPushButton("Generate Children");
@@ -67,7 +68,7 @@ struct my_widget final: QWidget
 	{
 		auto const items = m_list->selectedItems();
 		QTreeWidgetItem* item = nullptr;
-		if (!items.isEmpty() && !(item = items[0]))
+		if(!items.isEmpty() && !(item = items[0]))
 		{
 			return;
 		}
@@ -75,19 +76,19 @@ struct my_widget final: QWidget
 		auto const depth = m_depth->value();
 		auto const name = item->text(0);
 
-		for (int i = 0; i < depth; ++i)
+		for(int i = 0; i < depth; ++i)
 		{
 			auto const top = new QTreeWidgetItem({name + QString::number(i)});
 
-			for (int i = 0; i < depth; ++i)
+			for(int i = 0; i < depth; ++i)
 			{
 				auto const child1 = new QTreeWidgetItem(top);
 				child1->setText(0, name + QString::number(i));
 
-				for (int i = 0; i < depth; ++i)
+				for(int i = 0; i < depth; ++i)
 				{
 					auto const child2 = new QTreeWidgetItem(child1);
-					child2->setText(0 , name + QString::number(i));
+					child2->setText(0, name + QString::number(i));
 				}
 			}
 

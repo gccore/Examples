@@ -11,9 +11,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#find_package(QT NAMES Qt6 Qt5 COMPONENTS PrintSupport Widgets Charts Qml Quick Gui Core REQUIRED)
-#find_package(Qt${QT_VERSION_MAJOR} COMPONENTS PrintSupport Widgets Charts Qml Quick Gui Core REQUIRED)
-find_package(Qt5 COMPONENTS PrintSupport Widgets Charts Qml Quick Gui Core REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS PrintSupport Widgets Charts Qml Quick Gui Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS PrintSupport Widgets Charts Qml Quick Gui Core REQUIRED)
+#find_package(Qt5 COMPONENTS PrintSupport Widgets Charts Qml Quick Gui Core REQUIRED)
 
 file(GLOB HEADER_ONLY_FILES source/*.hpp)
 file(GLOB SOURCE_FILES      source/*.cpp)

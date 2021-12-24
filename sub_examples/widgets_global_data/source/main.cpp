@@ -21,44 +21,58 @@
 
 #include <QApplication>
 #include <QHBoxLayout>
+#include <QtGlobal>
 #include <QSpinBox>
 #include <QDialog>
 #include <QTimer>
 
-namespace global {
+namespace global
+{
 auto constexpr length = 2ULL;
 using internal_data_t = std::array<int, length>;
 internal_data_t data = {1, 2};
 } // namespace global
 
-namespace core {
-struct widget final: QDialog {
-  widget() : QDialog(nullptr) {
-    auto const _1 = new QSpinBox;
-    auto const _2 = new QSpinBox;
-    auto const layout = new QHBoxLayout;
-    layout->addWidget(_1);
-    layout->addWidget(_2);
-    setLayout(layout);
-    connect(_1, &QSpinBox::valueChanged, [](auto const value) {
-      global::data[0] = value;
-    });
-    connect(_2, &QSpinBox::valueChanged, [](auto const value) {
-      global::data[1] = value;
-    });
-    auto const timer = new QTimer(this);
-    timer->setInterval(100); timer->start();
-    connect(timer, &QTimer::timeout, [ = ] {
-      _1->setValue(global::data[0]);
-      _2->setValue(global::data[1]);
-    });
-  }
+namespace core
+{
+struct widget final : QDialog
+{
+	widget()
+		: QDialog(nullptr)
+	{
+		auto const _1 = new QSpinBox;
+		auto const _2 = new QSpinBox;
+		auto const layout = new QHBoxLayout;
+		layout->addWidget(_1);
+		layout->addWidget(_2);
+		setLayout(layout);
+		connect(_1, qOverload<int>(&QSpinBox::valueChanged),
+				[](auto const value)
+				{
+					global::data[0] = value;
+				});
+		connect(_2, qOverload<int>(&QSpinBox::valueChanged),
+				[](auto const value)
+				{
+					global::data[1] = value;
+				});
+		auto const timer = new QTimer(this);
+		timer->setInterval(100);
+		timer->start();
+		connect(timer, &QTimer::timeout,
+				[=]
+				{
+					_1->setValue(global::data[0]);
+					_2->setValue(global::data[1]);
+				});
+	}
 };
 } // namespace core
 
-int main(int argc, char* argv[]) {
-  QApplication application(argc, argv);
-  core::widget _1, _2, _3;
-  _1.show(), _2.show(), _3.show();
-  return application.exec();
+int main(int argc, char* argv[])
+{
+	QApplication application(argc, argv);
+	core::widget _1, _2, _3;
+	_1.show(), _2.show(), _3.show();
+	return application.exec();
 }
