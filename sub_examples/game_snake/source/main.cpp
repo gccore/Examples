@@ -35,26 +35,95 @@ auto constexpr kColumnLength = kRowLength;
 template<typename T, std::size_t Length>
 using TileArray = std::array<T, Length>;
 using Matrix = TileArray<TileArray<std::size_t, kColumnLength>, kRowLength>;
+
+enum class InitState
+{
+	kInitialized,
+	kUninitialized
+};
 } // namespace Core
 
 namespace Map
 {
-struct Tile final
+auto constexpr kEntitySymbol = 'X';
+auto constexpr kMaxInitSleepSec = 10ULL;
+
+struct Tile
 {
+	static auto constexpr kDefaultSymbol = '0';
+
 	std::size_t row = 0;
 	std::size_t column = 0;
 
-	inline bool operator==(Tile const& other) const
+	inline bool operator==(Tile const other) const
 	{
 		return (row == other.row) && (column == other.column);
 	}
-	inline bool operator!=(Tile const& other) const
+	inline bool operator!=(Tile const other) const
 	{
 		return (row != other.row) || (column != other.column);
 	}
 };
-auto constexpr kExitTile = Tile{0ULL, 9ULL};
-auto constexpr kBadTile = Tile{9ULL, 9ULL};
+
+class SpecialTile : public Tile
+{
+public:
+	virtual void generatePoint() = 0;
+	virtual char getSymbol() const = 0;
+
+	bool isInitialized() const
+	{
+		return init_state_ == Core::InitState::kInitialized;
+	}
+
+protected:
+	auto getState() const
+	{
+		return init_state_;
+	}
+	void setState(Core::InitState const state)
+	{
+		init_state_ = state;
+	}
+	void generateRandomPoint()
+	{
+		row = std::rand() % Core::kRowLength;
+		column = std::rand() % Core::kColumnLength;
+	}
+
+private:
+	Core::InitState init_state_ = Core::InitState::kUninitialized;
+};
+
+class BadTile final : public SpecialTile
+{
+public:
+	void generatePoint() override
+	{
+		setState(Core::InitState::kInitialized);
+		generateRandomPoint();
+	}
+	char getSymbol() const override
+	{
+		return 'B';
+	}
+};
+class ExitTile final : public SpecialTile
+{
+public:
+	void generatePoint() override
+	{
+		setState(Core::InitState::kInitialized);
+		generateRandomPoint();
+	}
+	char getSymbol() const override
+	{
+		return 'E';
+	}
+};
+
+BadTile badTile;
+ExitTile exitTile;
 } // namespace Map
 
 namespace Utility
@@ -120,19 +189,23 @@ void PrintMap(Core::Matrix const& map, Map::Tile const& pos)
 			auto const point = Map::Tile{i, j};
 			if(point == pos)
 			{
-				std::cout << "X ";
+				std::cout << Map::kEntitySymbol << ' ';
 			}
-			else if(Map::kExitTile == point)
+			else if(Map::exitTile == point)
 			{
-				std::cout << "E ";
+				std::cout << (Map::exitTile.isInitialized() ? Map::exitTile.getSymbol() :
+																Map::Tile::kDefaultSymbol)
+						  << ' ';
 			}
-			else if(Map::kBadTile == point)
+			else if(Map::badTile == point)
 			{
-				std::cout << "B ";
+				std::cout << (Map::badTile.isInitialized() ? Map::badTile.getSymbol() :
+															   Map::Tile::kDefaultSymbol)
+						  << ' ';
 			}
 			else
 			{
-				std::cout << "0 ";
+				std::cout << Map::Tile::kDefaultSymbol << ' ';
 			}
 		}
 		std::cout << std::endl;
@@ -147,21 +220,41 @@ int main()
 	std::size_t steps = 0ULL;
 
 	std::srand(std::time(nullptr));
+	auto const init_time = std::time(nullptr);
+	auto const time_for_bad_tile_init = std::time_t(std::rand() % Map::kMaxInitSleepSec);
+	auto const time_for_exit_tile_init = std::time_t(std::rand() % Map::kMaxInitSleepSec);
+
 	do
 	{
+		if(!Map::badTile.isInitialized() || !Map::exitTile.isInitialized())
+		{
+			auto const current_time = std::time(nullptr);
+			if(!Map::badTile.isInitialized() &&
+			   (init_time + time_for_bad_tile_init) < current_time)
+			{
+				Map::badTile.generatePoint();
+			}
+			if(!Map::exitTile.isInitialized() &&
+			   (init_time + time_for_exit_tile_init) < current_time)
+			{
+				Map::exitTile.generatePoint();
+			}
+		}
+
 		steps += 1ULL;
 		Utility::MoveCurrentPosition(current_pos);
 		Utility::PrintMap(map, current_pos);
 
 		std::this_thread::sleep_for(100ms);
-	} while((current_pos != Map::kExitTile) && (current_pos != Map::kBadTile));
+	} while(((!Map::exitTile.isInitialized() || !Map::badTile.isInitialized())) ||
+			((current_pos != Map::exitTile) && (current_pos != Map::badTile)));
 
 	std::cout << std::endl;
-	if(current_pos == Map::kExitTile)
+	if(current_pos == Map::exitTile)
 	{
 		std::cout << "You Win After: " << steps << " Steps." << std::endl;
 	}
-	else if(current_pos == Map::kBadTile)
+	else if(current_pos == Map::badTile)
 	{
 		std::cout << "You Died After: " << steps << " Steps." << std::endl;
 	}
