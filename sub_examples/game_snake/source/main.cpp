@@ -27,10 +27,19 @@
 
 using namespace std::chrono_literals;
 
-namespace Core
+namespace core
 {
-auto constexpr kRowLength = 10ULL;
-auto constexpr kColumnLength = kRowLength;
+namespace color
+{
+auto constexpr kGreen = "\033[42m";
+auto constexpr kBlack = "\033[40m";
+auto constexpr kBlue = "\033[0;94m";
+auto constexpr kRed = "\033[41m";
+auto constexpr kNul = "\033[0m";
+} // namespace color
+
+auto constexpr kRowLength = 16ULL;
+auto constexpr kColumnLength = kRowLength + kRowLength;
 
 template<typename T, std::size_t Length>
 using TileArray = std::array<T, Length>;
@@ -41,16 +50,28 @@ enum class InitState
 	kInitialized,
 	kUninitialized
 };
-} // namespace Core
+} // namespace core
 
-namespace Map
+namespace map
 {
 auto constexpr kEntitySymbol = 'X';
 auto constexpr kMaxInitSleepSec = 10ULL;
 
+auto GetEntitySymbol()
+{
+	using namespace core::color;
+	return std::string(kBlue) + kEntitySymbol + kNul;
+}
+
 struct Tile
 {
-	static auto constexpr kDefaultSymbol = '0';
+	static auto constexpr kDefaultSymbol = ' ';
+
+	static auto getDefaultSymbol()
+	{
+		using namespace core::color;
+		return std::string(kBlack) + kDefaultSymbol + kNul;
+	}
 
 	std::size_t row = 0;
 	std::size_t column = 0;
@@ -73,7 +94,7 @@ public:
 
 	bool isInitialized() const
 	{
-		return init_state_ == Core::InitState::kInitialized;
+		return init_state_ == core::InitState::kInitialized;
 	}
 
 protected:
@@ -81,18 +102,18 @@ protected:
 	{
 		return init_state_;
 	}
-	void setState(Core::InitState const state)
+	void setState(core::InitState const state)
 	{
 		init_state_ = state;
 	}
 	void generateRandomPoint()
 	{
-		row = std::rand() % Core::kRowLength;
-		column = std::rand() % Core::kColumnLength;
+		row = std::rand() % core::kRowLength;
+		column = std::rand() % core::kColumnLength;
 	}
 
 private:
-	Core::InitState init_state_ = Core::InitState::kUninitialized;
+	core::InitState init_state_ = core::InitState::kUninitialized;
 };
 
 class BadTile final : public SpecialTile
@@ -100,7 +121,7 @@ class BadTile final : public SpecialTile
 public:
 	void generatePoint() override
 	{
-		setState(Core::InitState::kInitialized);
+		setState(core::InitState::kInitialized);
 		generateRandomPoint();
 	}
 	char getSymbol() const override
@@ -113,7 +134,7 @@ class ExitTile final : public SpecialTile
 public:
 	void generatePoint() override
 	{
-		setState(Core::InitState::kInitialized);
+		setState(core::InitState::kInitialized);
 		generateRandomPoint();
 	}
 	char getSymbol() const override
@@ -122,11 +143,41 @@ public:
 	}
 };
 
-BadTile badTile;
-ExitTile exitTile;
-} // namespace Map
+static BadTile badTile;
+static ExitTile exitTile;
 
-namespace Utility
+auto GetBadTileChar()
+{
+	std::string result;
+	result = Tile::getDefaultSymbol();
+
+	if(badTile.isInitialized())
+	{
+		result = core::color::kRed;
+		result += badTile.getSymbol();
+		result += core::color::kNul;
+	}
+
+	return result;
+}
+auto GetExitTileChar()
+{
+	std::string result;
+	result = Tile::getDefaultSymbol();
+
+	if(exitTile.isInitialized())
+	{
+		result = core::color::kGreen;
+		result += exitTile.getSymbol();
+		result += core::color::kNul;
+	}
+
+	return result;
+}
+
+} // namespace map
+
+namespace utility
 {
 enum class Direction
 {
@@ -139,7 +190,7 @@ auto GetRandomPosition()
 {
 	return static_cast<Direction>(std::rand() % 4);
 }
-void MoveCurrentPosition(Map::Tile& pos)
+void MoveCurrentPosition(map::Tile& pos)
 {
 	switch(GetRandomPosition())
 	{
@@ -150,7 +201,7 @@ void MoveCurrentPosition(Map::Tile& pos)
 		}
 		break;
 	case Direction::Down:
-		if(pos.row < Core::kRowLength - 1)
+		if(pos.row < core::kRowLength - 1)
 		{
 			pos.row += 1;
 		}
@@ -162,7 +213,7 @@ void MoveCurrentPosition(Map::Tile& pos)
 		}
 		break;
 	case Direction::Right:
-		if(pos.column < Core::kColumnLength - 1)
+		if(pos.column < core::kColumnLength - 1)
 		{
 			pos.column += 1;
 		}
@@ -179,82 +230,80 @@ void ClearConsoleScreen()
 	std::system("clear");
 #endif
 }
-void PrintMap(Core::Matrix const& map, Map::Tile const& pos)
+void PrintMap(core::Matrix const& map_mat, map::Tile const& pos)
 {
 	ClearConsoleScreen();
-	for(std::size_t i = 0; i < map.size(); ++i)
+	for(std::size_t i = 0; i < map_mat.size(); ++i)
 	{
-		for(std::size_t j = 0; j < map[i].size(); ++j)
+		for(std::size_t j = 0; j < map_mat[i].size(); ++j)
 		{
-			auto const point = Map::Tile{i, j};
+			auto const point = map::Tile{i, j};
 			if(point == pos)
 			{
-				std::cout << Map::kEntitySymbol << ' ';
+				std::cout << map::GetEntitySymbol();
 			}
-			else if(Map::exitTile == point)
+			else if(map::exitTile == point)
 			{
-				std::cout << (Map::exitTile.isInitialized() ? Map::exitTile.getSymbol() :
-																Map::Tile::kDefaultSymbol)
-						  << ' ';
+				std::cout << map::GetExitTileChar();
 			}
-			else if(Map::badTile == point)
+			else if(map::badTile == point)
 			{
-				std::cout << (Map::badTile.isInitialized() ? Map::badTile.getSymbol() :
-															   Map::Tile::kDefaultSymbol)
-						  << ' ';
+				std::cout << map::GetBadTileChar();
 			}
 			else
 			{
-				std::cout << Map::Tile::kDefaultSymbol << ' ';
+				std::cout << map::Tile::getDefaultSymbol();
 			}
 		}
 		std::cout << std::endl;
 	}
 }
-} // namespace Utility
+} // namespace utility
 
 int main()
 {
-	Core::Matrix map = {{{0ULL}}};
-	Map::Tile current_pos = {0ULL, 0ULL};
+	core::Matrix map = {{{0ULL}}};
+	map::Tile current_pos = {0ULL, 0ULL};
 	std::size_t steps = 0ULL;
 
 	std::srand(std::time(nullptr));
 	auto const init_time = std::time(nullptr);
-	auto const time_for_bad_tile_init = std::time_t(std::rand() % Map::kMaxInitSleepSec);
-	auto const time_for_exit_tile_init = std::time_t(std::rand() % Map::kMaxInitSleepSec);
+	auto const time_for_bad_tile_init =
+		std::time_t(std::rand() % map::kMaxInitSleepSec);
+	auto const time_for_exit_tile_init =
+		std::time_t(std::rand() % map::kMaxInitSleepSec);
 
 	do
 	{
-		if(!Map::badTile.isInitialized() || !Map::exitTile.isInitialized())
+		if(!map::badTile.isInitialized() || !map::exitTile.isInitialized())
 		{
 			auto const current_time = std::time(nullptr);
-			if(!Map::badTile.isInitialized() &&
+			if(!map::badTile.isInitialized() &&
 			   (init_time + time_for_bad_tile_init) < current_time)
 			{
-				Map::badTile.generatePoint();
+				map::badTile.generatePoint();
 			}
-			if(!Map::exitTile.isInitialized() &&
+			if(!map::exitTile.isInitialized() &&
 			   (init_time + time_for_exit_tile_init) < current_time)
 			{
-				Map::exitTile.generatePoint();
+				map::exitTile.generatePoint();
 			}
 		}
 
 		steps += 1ULL;
-		Utility::MoveCurrentPosition(current_pos);
-		Utility::PrintMap(map, current_pos);
+		utility::MoveCurrentPosition(current_pos);
+		utility::PrintMap(map, current_pos);
 
 		std::this_thread::sleep_for(100ms);
-	} while(((!Map::exitTile.isInitialized() || !Map::badTile.isInitialized())) ||
-			((current_pos != Map::exitTile) && (current_pos != Map::badTile)));
+	} while(((!map::exitTile.isInitialized() || !map::badTile.isInitialized())) ||
+			((current_pos != map::exitTile) && (current_pos != map::badTile)));
 
 	std::cout << std::endl;
-	if(current_pos == Map::exitTile)
+	if(current_pos == map::exitTile)
 	{
 		std::cout << "You Win After: " << steps << " Steps." << std::endl;
 	}
-	else if(current_pos == Map::badTile)
+	else if(current_pos == map::badTile)
 	{
 		std::cout << "You Died After: " << steps << " Steps." << std::endl;
 	}
