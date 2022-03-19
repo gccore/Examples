@@ -1,0 +1,5 @@
+function(core_ConfigQCustomPlot target_name)
+  add_subdirectory(third_party/QCustomPlot)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE QCUSTOMPLOT_USE_LIBRARY)
+  target_link_libraries(${PROJECT_NAME} PRIVATE core::third_party::QCustomPlot)
+endfunction()
