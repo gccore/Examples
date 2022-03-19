@@ -35,11 +35,14 @@ int main(int argc, char* argv[]) {
     for (auto const& file_name : plugin_dir.entryList(QDir::Files)) {
       if (QLibrary::isLibrary(file_name)) {
         auto* const loader = new QPluginLoader(plugin_dir.absoluteFilePath(file_name));
-        qDebug() << loader->errorString();
         auto* const object = qobject_cast<core::plugins::interface::Plugin*>(loader->instance());
-        auto const widget = object->init_plugin();
-        if (nullptr != widget) {
-          widget->show();
+        if (nullptr != object) {
+          auto const widget = object->init_plugin();
+          if (nullptr != widget) {
+            widget->show();
+          }
+        } else {
+          qDebug() << loader->errorString();
         }
       }
     }

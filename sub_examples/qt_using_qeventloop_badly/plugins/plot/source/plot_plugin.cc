@@ -11,6 +11,8 @@ namespace core::plugins::plot {
 QPointer<QWidget> Plot::init_plugin() {
   widget_ = new QCustomPlot;
 
+  widget_->setMinimumSize(QSize(300, 300));
+
   widget_->addGraph();
   widget_->graph(0)->setPen(QPen(QColor(40, 110, 255)));
   QSharedPointer<QCPAxisTickerTime> time_ticker(new QCPAxisTickerTime);

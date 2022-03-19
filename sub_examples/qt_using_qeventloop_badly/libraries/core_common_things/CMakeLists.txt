@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS off)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+find_package(Qt5Core)
+
 file(GLOB public_files
   include/${PROJECT_NAME}/*.cc
   include/${PROJECT_NAME}/*.inc
@@ -26,4 +28,7 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  Qt5::Core
 )
