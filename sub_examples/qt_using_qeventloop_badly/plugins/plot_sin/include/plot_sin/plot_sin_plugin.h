@@ -4,7 +4,9 @@
 #include "core_interface/core_interface.h"
 #include "core_common_things/result.h"
 
+#include <QEventLoop>
 #include <QPointer>
+#include <QThread>
 #include <QPointF>
 #include <QWidget>
 
@@ -23,6 +25,7 @@ private:
   Q_SIGNAL void on_value_updated(QPointF const& value);
 
   QPointer<QWidget> widget_;
+  QPointer<QThread> thread_;
 };
 }  // namespace core::plugins::plot_sin
 

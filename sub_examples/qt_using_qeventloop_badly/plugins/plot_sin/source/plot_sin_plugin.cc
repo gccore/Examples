@@ -28,10 +28,15 @@ QPointer<QWidget> PlotSin::init_plugin() {
   widget_->setLayout(main_layout);
   widget_->setMinimumSize(QSize(200, 100));
   Q_EMIT request_for_plugin("Plot");
-  connect(this, &PlotSin::on_value_updated, this, [=](QPointF const& data) {
-    x_sin_value_label->setText(QString::number(std::sin(data.x())));
-    y_sin_value_label->setText(QString::number(std::sin(data.y())));
+  thread_ = QThread::create([=] {
+    QEventLoop event_loop;
+    connect(this, &PlotSin::on_value_updated, &event_loop, [=](QPointF const& data) {
+      x_sin_value_label->setText(QString::number(std::sin(data.x())));
+      y_sin_value_label->setText(QString::number(std::sin(data.y())));
+    });
+    event_loop.exec();
   });
+  thread_->start();
   return widget_;
 }
 QString PlotSin::get_plugin_name() const {
