@@ -21,10 +21,10 @@ QPointer<QWidget> Plot::init_plugin() {
   widget_->axisRect()->setupFullAxesBox();
   widget_->yAxis->setRange(-1.2, 1.2);
 
-  QObject::connect(widget_->xAxis, qOverload<QCPRange const&>(&QCPAxis::rangeChanged),
-                   widget_->xAxis2, qOverload<QCPRange const&>(&QCPAxis::setRange));
-  QObject::connect(widget_->yAxis, qOverload<QCPRange const&>(&QCPAxis::rangeChanged),
-                   widget_->yAxis2, qOverload<QCPRange const&>(&QCPAxis::setRange));
+  QObject::connect(widget_->xAxis, qOverload<QCPRange const &>(&QCPAxis::rangeChanged),
+                   widget_->xAxis2, qOverload<QCPRange const &>(&QCPAxis::setRange));
+  QObject::connect(widget_->yAxis, qOverload<QCPRange const &>(&QCPAxis::rangeChanged),
+                   widget_->yAxis2, qOverload<QCPRange const &>(&QCPAxis::setRange));
 
   static QTimer timer;
   QObject::connect(&timer, &QTimer::timeout, this, [this] {
@@ -35,8 +35,9 @@ QPointer<QWidget> Plot::init_plugin() {
     if (key - lastPointKey > 0.002)  // at most add point every 2 ms
     {
       // add data to lines:
-      widget_->graph(0)->addData(key,
-                                 qSin(key) + qrand() / (double)RAND_MAX * 1 * qSin(key / 0.3843));
+      auto const y = qSin(key) + qrand() / (double)RAND_MAX * 1 * qSin(key / 0.3843);
+      widget_->graph(0)->addData(key, y);
+      Q_EMIT new_data(QPointF(key, y));
       // rescale value (vertical) axis to fit the current data:
       //widget_->graph(0)->rescaleValueAxis();
       //widget_->graph(1)->rescaleValueAxis(true);
@@ -48,7 +49,7 @@ QPointer<QWidget> Plot::init_plugin() {
   });
   timer.start(0);
 
-  return qobject_cast<QWidget*>(widget_);
+  return qobject_cast<QWidget *>(widget_);
 }
 QString Plot::get_plugin_name() const {
   return "Plot";

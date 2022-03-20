@@ -6,11 +6,12 @@
 #include <QPointer>
 #include <QString>
 #include <QWidget>
+#include <QPointF>
 
 class QCustomPlot;
 
 namespace core::plugins::plot {
-class Plot final : public QObject, public interface::Plugin {
+class Plot final : public interface::Plugin {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID CORE_PLUGINS_INTERFACE FILE "meta.json")
   Q_INTERFACES(core::plugins::interface::Plugin)
@@ -18,6 +19,8 @@ class Plot final : public QObject, public interface::Plugin {
 public:
   QPointer<QWidget> init_plugin() override;
   QString get_plugin_name() const override;
+
+  Q_SIGNAL void new_data(QPointF const &data);
 
 private:
   QPointer<QCustomPlot> widget_;

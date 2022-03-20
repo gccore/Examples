@@ -29,9 +29,13 @@ public:
       : state(state), message(message) {
   }
 
+  operator bool() const noexcept {
+    return state;
+  }
+
   Data data;
-  QString message;
   bool state;
+  QString message;
 };
 }  // namespace core
 

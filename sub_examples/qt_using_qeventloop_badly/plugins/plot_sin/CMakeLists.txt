@@ -12,10 +12,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS off)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5PrintSupport REQUIRED)
+find_package(Qt5Core)
+find_package(Qt5Widgets)
 
 file(GLOB private_files
   source/*.cc
@@ -39,11 +37,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE
   core::plugins::Interface
-  Qt5::Gui
-  Qt5::Core
+  core::plugins::plot
+  core::CommonThings
   Qt5::Widgets
-  Qt5::PrintSupport
+  Qt5::Core
 )
-
-include(ConfigQCustomPlot)
-core_ConfigQCustomPlot(${PROJECT_NAME})

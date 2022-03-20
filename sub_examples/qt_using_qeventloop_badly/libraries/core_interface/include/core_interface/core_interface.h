@@ -10,7 +10,8 @@
 #include <QString>
 
 namespace core::plugins::interface {
-class Plugin {
+class Plugin : public QObject {
+  Q_OBJECT
 public:
   virtual QPointer<QWidget> init_plugin() {
     return nullptr;
@@ -18,10 +19,10 @@ public:
 
   virtual QString get_plugin_name() const = 0;
 
-  Q_SIGNAL void request_for_plugin(QString const& plugin_name);
-  Q_SLOT virtual void on_recived_plugin(Result<QPointer<Plugin>> const& plugin) {
+  Q_SLOT virtual void on_recived_plugin(Result<Plugin*> const& plugin) {
     Q_UNUSED(plugin);
   }
+  Q_SIGNAL void request_for_plugin(QString const& plugin_name);
 };
 }  // namespace core::plugins::interface
 
