@@ -16,14 +16,14 @@
  * g1999ramezani@gmail.com
  */
 
-#include <iostream>
-#include <cstdlib>
-#include <thread>
-#include <chrono>
-
 #include <boost/lockfree/queue.hpp>
+#include <chrono>
+#include <cstdlib>
+#include <iostream>
+#include <thread>
+#include <vector>
 
-#define SLEEP() \
+#define SLEEP()                               \
   auto const sleep_time = std::rand() % 1000; \
   std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
@@ -31,7 +31,8 @@ boost::lockfree::queue<int> queue(10'000'000);
 
 void producer() {
   while (true) {
-    while (not queue.push(std::rand()));
+    while (not queue.push(std::rand()))
+      ;
     SLEEP()
   }
 }
@@ -39,7 +40,8 @@ void producer() {
 void consumer() {
   while (true) {
     int data = -1;
-    while (queue.pop(data));
+    while (queue.pop(data))
+      ;
     std::cout << __PRETTY_FUNCTION__ << " " << data << std::endl;
     SLEEP()
   }

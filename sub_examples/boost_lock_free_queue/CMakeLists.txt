@@ -11,11 +11,14 @@ file(GLOB HEADER_ONLY_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.hpp)
 file(GLOB SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 file(GLOB HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.h)
 
+find_package(Threads REQUIRED)
+
 add_executable(${PROJECT_NAME} 
   ${HEADER_FILE_ONLY}
   ${SOURCE_FILES}
   ${HEADER_FILES}
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  pthread
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE
+    Threads::Threads
 )
