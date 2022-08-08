@@ -19,45 +19,39 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <vector>
 
-namespace directions
-{
-enum class right { };
-enum class left { };
-} // namespace direction
+namespace directions {
+enum class right {};
+enum class left {};
+}  // namespace directions
 
 template <typename Container>
-void shift(Container& data, std::size_t ratio, directions::right)
-{
-	for (; ratio != 0; --ratio)
-	{
-		auto const last_value = data[data.size() - 1];
-		data.erase(std::remove(data.begin(), data.end(), last_value));
-		data.insert(data.begin(), last_value);
-	}
+void shift(Container& data, std::size_t ratio, directions::right) {
+  for (; ratio != 0; --ratio) {
+    auto const last_value = data[data.size() - 1];
+    data.erase(std::remove(data.begin(), data.end(), last_value));
+    data.insert(data.begin(), last_value);
+  }
 }
 template <typename Container>
-void shift(Container& data, std::size_t ratio, directions::left)
-{
-	for (; ratio != 0; --ratio)
-	{
-		auto const first_value = *data.begin();
-		data.erase(std::remove(data.begin(), data.end(), first_value));
-		data.insert(data.end(), first_value);
-	}
+void shift(Container& data, std::size_t ratio, directions::left) {
+  for (; ratio != 0; --ratio) {
+    auto const first_value = *data.begin();
+    data.erase(std::remove(data.begin(), data.end(), first_value));
+    data.insert(data.end(), first_value);
+  }
 }
 
-int main()
-{
-	std::string string = "hello";
-	shift(string, 2, directions::left());
-	std::cout << string << std::endl;
+int main() {
+  std::string string = "hello";
+  shift(string, 2, directions::left());
+  std::cout << string << std::endl;
 
-	std::vector<std::string> strings = {"_1", "_2", "_3"};
-	shift(strings, 2, directions::right());
-	for (auto const& item : strings)
-	{
-		std::cout << item << ", ";
-	}
-	std::cout << std::endl;
+  std::vector<std::string> strings = {"_1", "_2", "_3"};
+  shift(strings, 2, directions::right());
+  for (auto const& item : strings) {
+    std::cout << item << ", ";
+  }
+  std::cout << std::endl;
 }
