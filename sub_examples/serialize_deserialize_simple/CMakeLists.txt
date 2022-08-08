@@ -17,3 +17,12 @@ add_executable(${PROJECT_NAME}
   ${SOURCE_FILES}
   ${HEADER_FILES}
 )
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED on
+)
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE
+    stdc++fs
+)

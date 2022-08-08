@@ -21,6 +21,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   ${SDL2_LIBRARIES}
   SDL2_image
   pthread
+  stdc++fs
 )
 target_include_directories(${PROJECT_NAME} PRIVATE
   utils
