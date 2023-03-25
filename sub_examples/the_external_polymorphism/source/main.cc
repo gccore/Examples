@@ -20,37 +20,26 @@
 #include <memory>
 #include <vector>
 
-template <typename Type>
-void print(Type const& object) {
-  object.print();
-}
-
 class Print {
  public:
   template <typename PrintType>
   Print(PrintType object)
-      : pimpl_(
-            std::make_unique<PrintableAdapter<PrintType>>(std::move(object))) {}
+      : pimpl_(std::make_unique<PrintAdapter<PrintType>>(std::move(object))) {}
+
+  void print() const { pimpl_->print(); }
 
  private:
-  class PrintConcept {
-   public:
+  struct PrintConcept {
     virtual ~PrintConcept() = default;
     virtual void print() const = 0;
   };
 
   template <typename Type>
-  class PrintableAdapter : public PrintConcept {
-   public:
-    PrintableAdapter(Type object) : this_(std::move(object)) {}
-
-    void print() const override { ::print<Type>(this_); }
-
-   private:
+  struct PrintAdapter final : public PrintConcept {
+    constexpr PrintAdapter(Type object) noexcept : this_(std::move(object)) {}
+    void print() const override { this_.print(); }
     Type this_;
   };
-
-  friend void print(Print const& object) { object.pimpl_->print(); }
 
   std::unique_ptr<PrintConcept> pimpl_;
 };
@@ -69,5 +58,5 @@ int main() {
   printable_list.emplace_back(First());
   printable_list.emplace_back(Second());
 
-  for (auto const& item : printable_list) print(item);
+  for (auto const& item : printable_list) item.print();
 }
