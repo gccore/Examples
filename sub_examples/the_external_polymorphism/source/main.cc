@@ -64,8 +64,6 @@ struct Second {
   void print() const { std::cout << __PRETTY_FUNCTION__ << std::endl; }
 };
 
-void print(First const& object) { object.print(); }
-
 int main() {
   std::vector<Print> printable_list;
   printable_list.emplace_back(First());
