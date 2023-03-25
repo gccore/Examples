@@ -25,7 +25,6 @@ endif()
 add_library(ep_lib STATIC external_polymorphism/print_concept.hh)
 target_include_directories(ep_lib PUBLIC external_polymorphism)
 set_target_properties(ep_lib PROPERTIES LINKER_LANGUAGE CXX)
-
 add_executable(ep
   external_polymorphism/print.hh
   external_polymorphism/print.cc
@@ -34,3 +33,12 @@ add_executable(ep
 target_link_libraries(ep PRIVATE ep_lib benchmark::benchmark)
 target_include_directories(ep PRIVATE external_polymorphism)
 
+add_library(gp_lib STATIC ghasem_polymorphism/print_interface.hh)
+target_include_directories(gp_lib PUBLIC ghasem_polymorphism/)
+set_target_properties(gp_lib PROPERTIES LINKER_LANGUAGE CXX)
+add_executable(gp
+  ghasem_polymorphism/print_impl.cc
+  ghasem_polymorphism/main.cc
+)
+target_link_libraries(gp PRIVATE gp_lib benchmark::benchmark)
+target_include_directories(gp PRIVATE ghasem_polymorphism/)
